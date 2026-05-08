@@ -4,7 +4,7 @@ import { Plane } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Login from './Login';
 
-export default function Navbar({ user, onSignOut }) {
+export default function Navbar({ user, onSignOut, onOpenSettings }) {
   return (
     <motion.nav 
       initial={{ y: -100, opacity: 0 }}
@@ -35,29 +35,57 @@ export default function Navbar({ user, onSignOut }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span className="cartoon-font" style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>
-              Hi, <span style={{ color: 'var(--ink-black)'}}>{user.displayName}</span>
+            {user.photoURL && (
+              <img src={user.photoURL} alt="Profile" style={{ width: '40px', height: '40px', borderRadius: '50%', border: '2px solid var(--ink-black)' }} />
+            )}
+            <span className="cartoon-font" style={{ color: 'var(--text-secondary)', fontSize: '1.5rem' }}>
+              Hi, <span style={{ color: 'var(--ink-black)', fontWeight: 'bold' }}>{user.displayName || 'Traveler'}</span>
             </span>
-            <button 
-              onClick={onSignOut}
-              style={{
-                background: 'var(--marker-red)',
-                border: '2px solid var(--ink-black)',
-                color: 'var(--ink-black)',
-                padding: '0.4rem 1rem',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontFamily: 'Nunito, sans-serif',
-                fontWeight: '800',
-                boxShadow: '3px 3px 0px var(--ink-black)',
-                transition: 'all 0.1s'
-              }}
-              onMouseOver={(e) => { e.currentTarget.style.transform = 'translate(-2px, -2px)'; e.currentTarget.style.boxShadow = '5px 5px 0px var(--ink-black)'; }}
-              onMouseOut={(e) => { e.currentTarget.style.transform = 'translate(0)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--ink-black)'; }}
-              onMouseDown={(e) => { e.currentTarget.style.transform = 'translate(2px, 2px)'; e.currentTarget.style.boxShadow = '1px 1px 0px var(--ink-black)'; }}
-            >
-              Sign Out
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button 
+                onClick={onOpenSettings}
+                style={{
+                  background: 'var(--marker-yellow)',
+                  border: '2px solid var(--ink-black)',
+                  color: 'var(--ink-black)',
+                  padding: '0.4rem 0.8rem',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontFamily: 'Nunito, sans-serif',
+                  fontWeight: '800',
+                  boxShadow: '3px 3px 0px var(--ink-black)',
+                  transition: 'all 0.1s'
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.transform = 'translate(-2px, -2px)'; e.currentTarget.style.boxShadow = '5px 5px 0px var(--ink-black)'; }}
+                onMouseOut={(e) => { e.currentTarget.style.transform = 'translate(0)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--ink-black)'; }}
+                onMouseDown={(e) => { e.currentTarget.style.transform = 'translate(2px, 2px)'; e.currentTarget.style.boxShadow = '1px 1px 0px var(--ink-black)'; }}
+              >
+                ⚙️ Settings
+              </button>
+              <button 
+                onClick={onSignOut}
+                style={{
+                  background: 'var(--marker-red)',
+                  border: '2px solid var(--ink-black)',
+                  color: 'var(--ink-black)',
+                  padding: '0.4rem 1rem',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontFamily: 'Nunito, sans-serif',
+                  fontWeight: '800',
+                  boxShadow: '3px 3px 0px var(--ink-black)',
+                  transition: 'all 0.1s'
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.transform = 'translate(-2px, -2px)'; e.currentTarget.style.boxShadow = '5px 5px 0px var(--ink-black)'; }}
+                onMouseOut={(e) => { e.currentTarget.style.transform = 'translate(0)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--ink-black)'; }}
+                onMouseDown={(e) => { e.currentTarget.style.transform = 'translate(2px, 2px)'; e.currentTarget.style.boxShadow = '1px 1px 0px var(--ink-black)'; }}
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

@@ -4,6 +4,7 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
+import SettingsModal from './components/SettingsModal';
 import { auth } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import './index.css';
@@ -53,6 +54,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState('dark');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     // Apply theme to document element
@@ -81,6 +83,13 @@ function App() {
     }
   };
 
+  const handleUserUpdated = () => {
+    // Force a re-render of the user object by spreading the current auth user
+    if (auth.currentUser) {
+      setUser({ ...auth.currentUser });
+    }
+  };
+
   if (loading) {
     return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'var(--text-primary)' }}>Loading...</div>;
   }
@@ -90,8 +99,22 @@ function App() {
       <CustomCursor />
       <div className="ambient-glow"></div>
       <div className="app-container">
-        <Navbar user={user} onSignOut={handleSignOut} theme={theme} toggleTheme={toggleTheme} />
+        <Navbar 
+          user={user} 
+          onSignOut={handleSignOut} 
+          theme={theme} 
+          toggleTheme={toggleTheme} 
+          onOpenSettings={() => setIsSettingsOpen(true)}
+        />
         
+        {isSettingsOpen && user && (
+          <SettingsModal 
+            user={user} 
+            onClose={() => setIsSettingsOpen(false)} 
+            onUserUpdated={handleUserUpdated}
+          />
+        )}
+
         <Routes>
           <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Landing onLoginSuccess={setUser} theme={theme} />} />
           <Route path="/dashboard" element={<Dashboard user={user} theme={theme} />} />
