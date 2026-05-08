@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const PREFERENCE_OPTIONS = [
   { id: 'street-food', label: '🍜 Street Food', value: 'street food' },
@@ -25,6 +27,8 @@ const DISRUPTION_OPTIONS = [
 const API_BASE = window.location.origin;
 
 export default function Dashboard({ user }) {
+  const [activeTab, setActiveTab] = useState('basics'); // basics, vibe, fun, needs
+
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -169,88 +173,192 @@ export default function Dashboard({ user }) {
             <div className="comic-box" style={{ padding: '1.5rem', textAlign: 'left', background: 'var(--paper-white)' }}>
               <h2 className="cartoon-font" style={{ marginTop: 0, marginBottom: '1.25rem', fontSize: '2rem', color: 'var(--ink-black)' }}>Trip Details</h2>
               <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div>
-                  <label htmlFor="destination" style={labelStyle}>Destination *</label>
-                  <input id="destination" type="text" placeholder="e.g., Tokyo, Japan" value={destination}
-                    onChange={(e) => setDestination(e.target.value)} style={inputStyle} required aria-required="true" />
+                
+                {/* Accordion 1: Basics */}
+                <div style={{ border: '2px solid var(--ink-black)', borderRadius: '8px', overflow: 'hidden', boxShadow: '3px 3px 0px var(--ink-black)' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setActiveTab(activeTab === 'basics' ? '' : 'basics')}
+                    style={{ 
+                      width: '100%', padding: '1rem', background: activeTab === 'basics' ? 'var(--marker-yellow)' : 'white', 
+                      border: 'none', borderBottom: activeTab === 'basics' ? '2px solid var(--ink-black)' : 'none',
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer',
+                      fontFamily: 'Caveat, cursive', fontSize: '1.5rem', color: 'var(--ink-black)', fontWeight: 'bold'
+                    }}
+                  >
+                    📍 The Basics
+                    {activeTab === 'basics' ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
+                  </button>
+                  <AnimatePresence>
+                    {activeTab === 'basics' && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }} 
+                        animate={{ height: 'auto', opacity: 1 }} 
+                        exit={{ height: 0, opacity: 0 }}
+                        style={{ background: 'white', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}
+                      >
+                        <div>
+                          <label htmlFor="destination" style={labelStyle}>Destination *</label>
+                          <input id="destination" type="text" placeholder="e.g., Tokyo, Japan" value={destination}
+                            onChange={(e) => setDestination(e.target.value)} style={inputStyle} required aria-required="true" />
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.75rem' }}>
+                          <div style={{ flex: 1 }}>
+                            <label htmlFor="startDate" style={labelStyle}>Start Date *</label>
+                            <input id="startDate" type="date" value={startDate}
+                              onChange={(e) => setStartDate(e.target.value)} style={inputStyle} required aria-required="true" />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label htmlFor="endDate" style={labelStyle}>End Date *</label>
+                            <input id="endDate" type="date" value={endDate}
+                              onChange={(e) => setEndDate(e.target.value)} style={inputStyle} required aria-required="true" />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                  <div style={{ flex: 1 }}>
-                    <label htmlFor="startDate" style={labelStyle}>Start Date *</label>
-                    <input id="startDate" type="date" value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)} style={inputStyle} required aria-required="true" />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <label htmlFor="endDate" style={labelStyle}>End Date *</label>
-                    <input id="endDate" type="date" value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)} style={inputStyle} required aria-required="true" />
-                  </div>
+                {/* Accordion 2: Vibe */}
+                <div style={{ border: '2px solid var(--ink-black)', borderRadius: '8px', overflow: 'hidden', boxShadow: '3px 3px 0px var(--ink-black)' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setActiveTab(activeTab === 'vibe' ? '' : 'vibe')}
+                    style={{ 
+                      width: '100%', padding: '1rem', background: activeTab === 'vibe' ? 'var(--marker-blue)' : 'white', 
+                      border: 'none', borderBottom: activeTab === 'vibe' ? '2px solid var(--ink-black)' : 'none',
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer',
+                      fontFamily: 'Caveat, cursive', fontSize: '1.5rem', color: activeTab === 'vibe' ? 'white' : 'var(--ink-black)', fontWeight: 'bold'
+                    }}
+                  >
+                    👥 The Vibe
+                    {activeTab === 'vibe' ? <ChevronUp size={24} color="white" /> : <ChevronDown size={24} />}
+                  </button>
+                  <AnimatePresence>
+                    {activeTab === 'vibe' && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }} 
+                        animate={{ height: 'auto', opacity: 1 }} 
+                        exit={{ height: 0, opacity: 0 }}
+                        style={{ background: 'white', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}
+                      >
+                        <div style={{ display: 'flex', gap: '0.75rem' }}>
+                          <div style={{ flex: 1 }}>
+                            <label htmlFor="budget" style={labelStyle}>Budget</label>
+                            <select id="budget" value={budgetLevel} onChange={(e) => setBudgetLevel(e.target.value)} style={inputStyle}>
+                              <option value="budget">💰 Budget</option>
+                              <option value="moderate">💳 Moderate</option>
+                              <option value="luxury">💎 Luxury</option>
+                            </select>
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label htmlFor="traveler" style={labelStyle}>Traveler</label>
+                            <select id="traveler" value={travelerType} onChange={(e) => setTravelerType(e.target.value)} style={inputStyle}>
+                              <option value="solo">🧑 Solo</option>
+                              <option value="couple">👫 Couple</option>
+                              <option value="family">👨‍👩‍👧 Family</option>
+                              <option value="group">👥 Group</option>
+                            </select>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                  <div style={{ flex: 1 }}>
-                    <label htmlFor="budget" style={labelStyle}>Budget</label>
-                    <select id="budget" value={budgetLevel} onChange={(e) => setBudgetLevel(e.target.value)} style={inputStyle}>
-                      <option value="budget">💰 Budget</option>
-                      <option value="moderate">💳 Moderate</option>
-                      <option value="luxury">💎 Luxury</option>
-                    </select>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <label htmlFor="traveler" style={labelStyle}>Traveler</label>
-                    <select id="traveler" value={travelerType} onChange={(e) => setTravelerType(e.target.value)} style={inputStyle}>
-                      <option value="solo">🧑 Solo</option>
-                      <option value="couple">👫 Couple</option>
-                      <option value="family">👨‍👩‍👧 Family</option>
-                      <option value="group">👥 Group</option>
-                    </select>
-                  </div>
+                {/* Accordion 3: Fun Stuff */}
+                <div style={{ border: '2px solid var(--ink-black)', borderRadius: '8px', overflow: 'hidden', boxShadow: '3px 3px 0px var(--ink-black)' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setActiveTab(activeTab === 'fun' ? '' : 'fun')}
+                    style={{ 
+                      width: '100%', padding: '1rem', background: activeTab === 'fun' ? 'var(--marker-red)' : 'white', 
+                      border: 'none', borderBottom: activeTab === 'fun' ? '2px solid var(--ink-black)' : 'none',
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer',
+                      fontFamily: 'Caveat, cursive', fontSize: '1.5rem', color: activeTab === 'fun' ? 'white' : 'var(--ink-black)', fontWeight: 'bold'
+                    }}
+                  >
+                    ✨ Fun Stuff
+                    {activeTab === 'fun' ? <ChevronUp size={24} color="white" /> : <ChevronDown size={24} />}
+                  </button>
+                  <AnimatePresence>
+                    {activeTab === 'fun' && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }} 
+                        animate={{ height: 'auto', opacity: 1 }} 
+                        exit={{ height: 0, opacity: 0 }}
+                        style={{ background: 'white', padding: '1rem' }}
+                      >
+                        <label style={labelStyle}>Interests</label>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }} role="group" aria-label="Travel interests">
+                          {PREFERENCE_OPTIONS.map((pref) => (
+                            <button key={pref.id} type="button" onClick={() => togglePref(pref.value)}
+                              aria-pressed={selectedPrefs.includes(pref.value)}
+                              style={{
+                                padding: '6px 12px', borderRadius: '8px', fontSize: '1rem', fontFamily: 'Nunito, sans-serif', fontWeight: 'bold',
+                                border: '2px solid var(--ink-black)',
+                                background: selectedPrefs.includes(pref.value) ? 'var(--marker-red)' : 'var(--paper-white)',
+                                color: selectedPrefs.includes(pref.value) ? 'white' : 'var(--ink-black)',
+                                boxShadow: selectedPrefs.includes(pref.value) ? '1px 1px 0px var(--ink-black)' : '3px 3px 0px var(--ink-black)',
+                                transform: selectedPrefs.includes(pref.value) ? 'translate(2px, 2px)' : 'none',
+                                cursor: 'pointer', transition: 'all 0.1s',
+                              }}>
+                              {pref.label}
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                {/* Preferences Chips */}
-                <div style={{ marginTop: '0.5rem' }}>
-                  <label style={labelStyle}>Interests</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }} role="group" aria-label="Travel interests">
-                    {PREFERENCE_OPTIONS.map((pref) => (
-                      <button key={pref.id} type="button" onClick={() => togglePref(pref.value)}
-                        aria-pressed={selectedPrefs.includes(pref.value)}
-                        style={{
-                          padding: '6px 12px', borderRadius: '8px', fontSize: '1rem', fontFamily: 'Nunito, sans-serif', fontWeight: 'bold',
-                          border: '2px solid var(--ink-black)',
-                          background: selectedPrefs.includes(pref.value) ? 'var(--marker-blue)' : 'var(--paper-white)',
-                          color: selectedPrefs.includes(pref.value) ? 'white' : 'var(--ink-black)',
-                          boxShadow: selectedPrefs.includes(pref.value) ? '1px 1px 0px var(--ink-black)' : '3px 3px 0px var(--ink-black)',
-                          transform: selectedPrefs.includes(pref.value) ? 'translate(2px, 2px)' : 'none',
-                          cursor: 'pointer', transition: 'all 0.1s',
-                        }}>
-                        {pref.label}
-                      </button>
-                    ))}
-                  </div>
+                {/* Accordion 4: Special Needs */}
+                <div style={{ border: '2px solid var(--ink-black)', borderRadius: '8px', overflow: 'hidden', boxShadow: '3px 3px 0px var(--ink-black)' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setActiveTab(activeTab === 'needs' ? '' : 'needs')}
+                    style={{ 
+                      width: '100%', padding: '1rem', background: activeTab === 'needs' ? 'var(--marker-green)' : 'white', 
+                      border: 'none', borderBottom: activeTab === 'needs' ? '2px solid var(--ink-black)' : 'none',
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer',
+                      fontFamily: 'Caveat, cursive', fontSize: '1.5rem', color: activeTab === 'needs' ? 'white' : 'var(--ink-black)', fontWeight: 'bold'
+                    }}
+                  >
+                    ⚠️ Special Needs
+                    {activeTab === 'needs' ? <ChevronUp size={24} color="white" /> : <ChevronDown size={24} />}
+                  </button>
+                  <AnimatePresence>
+                    {activeTab === 'needs' && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }} 
+                        animate={{ height: 'auto', opacity: 1 }} 
+                        exit={{ height: 0, opacity: 0 }}
+                        style={{ background: 'white', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}
+                      >
+                        <div>
+                          <label htmlFor="maxWalking" style={labelStyle}>Max daily walking: {maxWalking} km</label>
+                          <input id="maxWalking" type="range" min="1" max="30" value={maxWalking}
+                            onChange={(e) => setMaxWalking(Number(e.target.value))}
+                            style={{ width: '100%', accentColor: 'var(--marker-green)' }}
+                            aria-valuemin={1} aria-valuemax={30} aria-valuenow={maxWalking} />
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input id="accessibility" type="checkbox" checked={accessibility}
+                            onChange={(e) => setAccessibility(e.target.checked)}
+                            style={{ accentColor: 'var(--marker-green)', width: '20px', height: '20px', cursor: 'pointer' }} />
+                          <label htmlFor="accessibility" style={{ ...labelStyle, margin: 0, cursor: 'pointer' }}>♿ Accessibility needed</label>
+                        </div>
+                        <div>
+                          <label htmlFor="dietary" style={labelStyle}>Dietary restrictions</label>
+                          <input id="dietary" type="text" placeholder="e.g., vegetarian, halal" value={dietary}
+                            onChange={(e) => setDietary(e.target.value)} style={inputStyle} />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                {/* Constraints */}
-                <div>
-                  <label htmlFor="maxWalking" style={labelStyle}>Max daily walking: {maxWalking} km</label>
-                  <input id="maxWalking" type="range" min="1" max="30" value={maxWalking}
-                    onChange={(e) => setMaxWalking(Number(e.target.value))}
-                    style={{ width: '100%', accentColor: 'var(--accent-google-blue)' }}
-                    aria-valuemin={1} aria-valuemax={30} aria-valuenow={maxWalking} />
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input id="accessibility" type="checkbox" checked={accessibility}
-                    onChange={(e) => setAccessibility(e.target.checked)}
-                    style={{ accentColor: 'var(--accent-google-green)' }} />
-                  <label htmlFor="accessibility" style={{ ...labelStyle, margin: 0 }}>♿ Accessibility needed</label>
-                </div>
-
-                <div>
-                  <label htmlFor="dietary" style={labelStyle}>Dietary restrictions</label>
-                  <input id="dietary" type="text" placeholder="e.g., vegetarian, halal" value={dietary}
-                    onChange={(e) => setDietary(e.target.value)} style={inputStyle} />
-                </div>
+                <hr style={{ border: '1px dashed var(--ink-black)', margin: '0.5rem 0', opacity: 0.3 }} />
 
                 <button type="button" onClick={handleGenerate} disabled={loading}
                   aria-busy={loading}
@@ -259,7 +367,7 @@ export default function Dashboard({ user }) {
                     background: loading ? 'var(--text-secondary)' : 'var(--marker-yellow)',
                     color: 'var(--ink-black)', border: '2px solid var(--ink-black)', padding: '1rem',
                     borderRadius: '8px', fontWeight: 'bold', fontSize: '1.2rem',
-                    cursor: loading ? 'wait' : 'pointer', marginTop: '1rem',
+                    cursor: loading ? 'wait' : 'pointer', marginTop: '0.5rem',
                     transition: 'all 0.1s', fontFamily: 'Nunito, sans-serif',
                     boxShadow: '4px 4px 0px var(--ink-black)'
                   }}
