@@ -110,3 +110,14 @@ h1, h2, h3, h4, h5, h6, .cartoon-font {
   z-index: -1;
   pointer-events: none;
 }
+
+/* Day Carousel Navigation */
+.day-nav-btn:hover:not(:disabled) {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: 5px 5px 0px var(--ink-black) !important;
+}
+.day-nav-btn:active:not(:disabled) {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 1px 1px 0px var(--ink-black) !important;
+}
+

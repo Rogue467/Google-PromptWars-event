@@ -72,6 +72,12 @@ async def health_check():
     return HealthResponse(llm_provider=settings.llm_provider)
 
 
+@app.get("/api/maps-key", tags=["Config"])
+async def get_maps_key():
+    """Return Google Maps API key for frontend map rendering."""
+    return {"key": settings.google_maps_api_key}
+
+
 @app.post("/api/plan", tags=["Planning"])
 async def plan_trip(request: Request, trip: TripRequest):
     """Generate a dynamic trip itinerary.

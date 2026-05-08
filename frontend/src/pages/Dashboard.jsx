@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, Bookmark, Trash2, Eye } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Bookmark, Trash2, Eye } from 'lucide-react';
 import { saveTrip, subscribeToSavedTrips, deleteSavedTrip } from '../services/firestoreService';
+import ItineraryMap from '../components/ItineraryMap';
 
 const PREFERENCE_OPTIONS = [
   { id: 'street-food', label: '🍜 Street Food', value: 'street food' },
@@ -47,6 +48,46 @@ export default function Dashboard({ user }) {
   const [savedTrips, setSavedTrips] = useState([]);
   const [saveStatus, setSaveStatus] = useState(''); // '' | 'saving' | 'saved'
   const [viewingSavedTrip, setViewingSavedTrip] = useState(null);
+
+  // Carousel state
+  const [activeDay, setActiveDay] = useState(0);
+  const [slideDirection, setSlideDirection] = useState(0); // -1 left, 1 right
+  const [mapsApiKey, setMapsApiKey] = useState('');
+
+  const totalDays = itinerary?.itinerary?.length || 0;
+  const currentDay = itinerary?.itinerary?.[activeDay] || null;
+
+  const goToDay = useCallback((idx) => {
+    if (!itinerary?.itinerary) return;
+    const clamped = Math.max(0, Math.min(idx, itinerary.itinerary.length - 1));
+    setSlideDirection(clamped > activeDay ? 1 : -1);
+    setActiveDay(clamped);
+  }, [itinerary, activeDay]);
+
+  const goNext = useCallback(() => goToDay(activeDay + 1), [goToDay, activeDay]);
+  const goPrev = useCallback(() => goToDay(activeDay - 1), [goToDay, activeDay]);
+
+  // Keyboard navigation for carousel
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!itinerary?.itinerary) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); goNext(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goPrev(); }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [itinerary, goNext, goPrev]);
+
+  // Reset activeDay when new itinerary loads
+  useEffect(() => { setActiveDay(0); }, [itinerary]);
+
+  // Fetch Maps API key
+  useEffect(() => {
+    fetch(`${API_BASE}/api/maps-key`)
+      .then(r => r.json())
+      .then(d => { if (d.key) setMapsApiKey(d.key); })
+      .catch(() => {});
+  }, []);
 
   // Subscribe to saved trips
   useEffect(() => {
@@ -474,76 +515,181 @@ export default function Dashboard({ user }) {
                   </div>
                 </div>
 
-                {/* Day Cards */}
-                {(itinerary.itinerary || []).map((day) => (
-                  <div key={day.day} className="comic-box" style={{ padding: '1.5rem', background: 'var(--paper-white)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                      <h3 className="cartoon-font" style={{ margin: 0, color: 'var(--marker-blue)', fontSize: '1.8rem' }}>
-                        Day {day.day} — {day.theme}
-                      </h3>
-                      <span className="cartoon-font" style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>{day.date}</span>
-                    </div>
-                    {day.weather_note && (
-                      <p className="cartoon-font" style={{ color: 'var(--marker-yellow)', fontSize: '1.2rem', margin: '0 0 1rem 0' }}>
-                        🌤️ {day.weather_note}
-                      </p>
-                    )}
-
-                    {/* Activities */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      {(day.activities || []).map((act, i) => (
-                        <div key={i} style={{
-                          display: 'flex', gap: '1rem', padding: '1rem',
-                          background: 'white', borderRadius: '8px',
+                {/* Day Card Carousel */}
+                {totalDays > 0 && (
+                  <div>
+                    {/* Navigation Bar */}
+                    <div style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      marginBottom: '1rem', gap: '0.5rem',
+                    }}>
+                      <button
+                        onClick={goPrev} disabled={activeDay === 0}
+                        className="day-nav-btn"
+                        aria-label="Previous day"
+                        style={{
+                          width: '48px', height: '48px', borderRadius: '50%',
                           border: '2px solid var(--ink-black)',
-                          boxShadow: '3px 3px 0px var(--ink-black)'
-                        }}>
-                          <div className="cartoon-font" style={{ minWidth: '60px', color: 'var(--marker-red)', fontSize: '1.2rem' }}>
-                            {act.time}
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <div className="cartoon-font" style={{ fontSize: '1.5rem', marginBottom: '4px', color: 'var(--ink-black)' }}>
-                              {act.name}
-                              {act.indoor && <span style={{ marginLeft: '8px', fontSize: '1rem', color: 'var(--text-secondary)' }}>🏠 Indoor</span>}
-                            </div>
-                            <div style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontFamily: 'Nunito, sans-serif' }}>{act.description}</div>
-                            <div className="cartoon-font" style={{ display: 'flex', gap: '12px', marginTop: '8px', fontSize: '1.2rem', color: 'var(--ink-black)' }}>
-                              <span>⏱️ {act.duration_hours}h</span>
-                              <span>💵 ${act.estimated_cost_usd}</span>
-                              <span style={{
-                                background: 'var(--marker-blue)', padding: '2px 8px',
-                                borderRadius: '8px', color: 'white', border: '2px solid var(--ink-black)'
-                              }}>{act.category}</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                          background: activeDay === 0 ? '#eee' : 'var(--marker-blue)',
+                          color: activeDay === 0 ? '#aaa' : 'white',
+                          cursor: activeDay === 0 ? 'not-allowed' : 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          boxShadow: activeDay === 0 ? 'none' : '3px 3px 0px var(--ink-black)',
+                          transition: 'all 0.15s', flexShrink: 0,
+                        }}
+                      >
+                        <ChevronLeft size={24} />
+                      </button>
+
+                      {/* Day Dots */}
+                      <div style={{
+                        display: 'flex', gap: '6px', flexWrap: 'wrap',
+                        justifyContent: 'center', flex: 1,
+                      }}>
+                        {itinerary.itinerary.map((_, idx) => (
+                          <button
+                            key={idx} onClick={() => goToDay(idx)}
+                            aria-label={`Go to day ${idx + 1}`}
+                            aria-current={idx === activeDay ? 'step' : undefined}
+                            style={{
+                              width: idx === activeDay ? '32px' : '12px',
+                              height: '12px', borderRadius: '6px',
+                              border: '2px solid var(--ink-black)',
+                              background: idx === activeDay ? 'var(--marker-red)' : 'var(--paper-white)',
+                              cursor: 'pointer', transition: 'all 0.2s',
+                              padding: 0,
+                              boxShadow: idx === activeDay ? '2px 2px 0px var(--ink-black)' : 'none',
+                            }}
+                          />
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={goNext} disabled={activeDay >= totalDays - 1}
+                        className="day-nav-btn"
+                        aria-label="Next day"
+                        style={{
+                          width: '48px', height: '48px', borderRadius: '50%',
+                          border: '2px solid var(--ink-black)',
+                          background: activeDay >= totalDays - 1 ? '#eee' : 'var(--marker-blue)',
+                          color: activeDay >= totalDays - 1 ? '#aaa' : 'white',
+                          cursor: activeDay >= totalDays - 1 ? 'not-allowed' : 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          boxShadow: activeDay >= totalDays - 1 ? 'none' : '3px 3px 0px var(--ink-black)',
+                          transition: 'all 0.15s', flexShrink: 0,
+                        }}
+                      >
+                        <ChevronRight size={24} />
+                      </button>
                     </div>
 
-                    {/* Meals */}
-                    {day.meals && day.meals.length > 0 && (
-                      <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '2px dashed var(--ink-black)' }}>
-                        <div className="cartoon-font" style={{ fontSize: '1.5rem', color: 'var(--ink-black)', marginBottom: '0.5rem' }}>🍽️ Meals</div>
-                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                          {day.meals.map((meal, i) => (
-                            <span key={i} style={{
-                              padding: '6px 12px', borderRadius: '8px', fontSize: '1rem', fontFamily: 'Nunito, sans-serif', fontWeight: 'bold',
-                              background: 'var(--marker-yellow)', color: 'var(--ink-black)', border: '2px solid var(--ink-black)', boxShadow: '2px 2px 0px var(--ink-black)'
-                            }}>
-                              {meal.meal_type}: {meal.suggestion} (${meal.estimated_cost_usd})
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    {/* Keyboard hint */}
+                    <div style={{
+                      textAlign: 'center', marginBottom: '0.75rem',
+                      fontSize: '0.85rem', color: 'var(--text-secondary)',
+                      fontFamily: "'Nunito', sans-serif",
+                    }}>
+                      ← → Use arrow keys to navigate days
+                    </div>
 
-                    {day.daily_budget_estimate_usd > 0 && (
-                      <div className="cartoon-font" style={{ textAlign: 'right', marginTop: '1rem', fontSize: '1.5rem', color: 'var(--marker-green)' }}>
-                        Day budget: ${day.daily_budget_estimate_usd}
-                      </div>
-                    )}
+                    {/* Animated Card */}
+                    <div style={{ position: 'relative', overflow: 'hidden', minHeight: '300px' }}>
+                      <AnimatePresence mode="wait" initial={false}>
+                        {currentDay && (
+                          <motion.div
+                            key={currentDay.day}
+                            initial={{ x: slideDirection * 300, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: -slideDirection * 300, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                          >
+                            <div className="comic-box" style={{ padding: '1.5rem', background: 'var(--paper-white)' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <h3 className="cartoon-font" style={{ margin: 0, color: 'var(--marker-blue)', fontSize: '1.8rem' }}>
+                                  Day {currentDay.day} — {currentDay.theme}
+                                </h3>
+                                <span className="cartoon-font" style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>{currentDay.date}</span>
+                              </div>
+                              {currentDay.weather_note && (
+                                <p className="cartoon-font" style={{ color: 'var(--marker-yellow)', fontSize: '1.2rem', margin: '0 0 1rem 0' }}>
+                                  🌤️ {currentDay.weather_note}
+                                </p>
+                              )}
+
+                              {/* Activities */}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {(currentDay.activities || []).map((act, i) => (
+                                  <div key={i} style={{
+                                    display: 'flex', gap: '1rem', padding: '1rem',
+                                    background: 'white', borderRadius: '8px',
+                                    border: '2px solid var(--ink-black)',
+                                    boxShadow: '3px 3px 0px var(--ink-black)'
+                                  }}>
+                                    <div className="cartoon-font" style={{ minWidth: '60px', color: 'var(--marker-red)', fontSize: '1.2rem' }}>
+                                      {act.time}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                      <div className="cartoon-font" style={{ fontSize: '1.5rem', marginBottom: '4px', color: 'var(--ink-black)' }}>
+                                        {act.name}
+                                        {act.indoor && <span style={{ marginLeft: '8px', fontSize: '1rem', color: 'var(--text-secondary)' }}>🏠 Indoor</span>}
+                                      </div>
+                                      <div style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontFamily: 'Nunito, sans-serif' }}>{act.description}</div>
+                                      {act.location && (
+                                        <div style={{ color: 'var(--marker-blue)', fontSize: '0.85rem', fontFamily: 'Nunito, sans-serif', marginTop: '4px' }}>
+                                          📍 {act.location}
+                                        </div>
+                                      )}
+                                      <div className="cartoon-font" style={{ display: 'flex', gap: '12px', marginTop: '8px', fontSize: '1.2rem', color: 'var(--ink-black)' }}>
+                                        <span>⏱️ {act.duration_hours}h</span>
+                                        <span>💵 ${act.estimated_cost_usd}</span>
+                                        <span style={{
+                                          background: 'var(--marker-blue)', padding: '2px 8px',
+                                          borderRadius: '8px', color: 'white', border: '2px solid var(--ink-black)'
+                                        }}>{act.category}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Meals */}
+                              {currentDay.meals && currentDay.meals.length > 0 && (
+                                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '2px dashed var(--ink-black)' }}>
+                                  <div className="cartoon-font" style={{ fontSize: '1.5rem', color: 'var(--ink-black)', marginBottom: '0.5rem' }}>🍽️ Meals</div>
+                                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                    {currentDay.meals.map((meal, i) => (
+                                      <span key={i} style={{
+                                        padding: '6px 12px', borderRadius: '8px', fontSize: '1rem', fontFamily: 'Nunito, sans-serif', fontWeight: 'bold',
+                                        background: 'var(--marker-yellow)', color: 'var(--ink-black)', border: '2px solid var(--ink-black)', boxShadow: '2px 2px 0px var(--ink-black)'
+                                      }}>
+                                        {meal.meal_type}: {meal.suggestion} (${meal.estimated_cost_usd})
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {currentDay.daily_budget_estimate_usd > 0 && (
+                                <div className="cartoon-font" style={{ textAlign: 'right', marginTop: '1rem', fontSize: '1.5rem', color: 'var(--marker-green)' }}>
+                                  Day budget: ${currentDay.daily_budget_estimate_usd}
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Google Map */}
+                    <div style={{ marginTop: '1rem' }}>
+                      <ItineraryMap
+                        day={currentDay}
+                        mapsApiKey={mapsApiKey}
+                        destination={itinerary.destination || destination}
+                      />
+                    </div>
                   </div>
-                ))}
+                )}
 
                 {/* Tips */}
                 {(itinerary.packing_tips?.length > 0 || itinerary.local_tips?.length > 0) && (

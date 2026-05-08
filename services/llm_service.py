@@ -19,6 +19,7 @@ RULES:
 4. Include local food recommendations
 5. Consider walking distances between activities
 6. Include estimated costs in USD
+7. ALWAYS include real street addresses and approximate lat/lng coordinates for every activity and meal location
 
 OUTPUT FORMAT (strict JSON, no markdown):
 {
@@ -34,6 +35,9 @@ OUTPUT FORMAT (strict JSON, no markdown):
         {
           "time": "09:00",
           "name": "Place name",
+          "location": "Full street address of the place",
+          "latitude": 35.7148,
+          "longitude": 139.7967,
           "description": "1-2 sentences",
           "category": "temple|museum|food|nature|shopping|entertainment|landmark",
           "estimated_cost_usd": 0,
@@ -42,7 +46,7 @@ OUTPUT FORMAT (strict JSON, no markdown):
         }
       ],
       "meals": [
-        {"meal_type": "breakfast", "suggestion": "Food/Restaurant", "cuisine": "local", "estimated_cost_usd": 10}
+        {"meal_type": "breakfast", "suggestion": "Food/Restaurant", "location": "Full street address", "latitude": 35.6654, "longitude": 139.7707, "cuisine": "local", "estimated_cost_usd": 10}
       ],
       "daily_budget_estimate_usd": 80
     }
