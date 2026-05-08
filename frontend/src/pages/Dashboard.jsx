@@ -138,6 +138,7 @@ export default function Dashboard({ user }) {
     fontFamily: 'Nunito, sans-serif', 
     fontSize: '1rem', 
     width: '100%',
+    boxSizing: 'border-box',
     boxShadow: '3px 3px 0px var(--ink-black)',
     outline: 'none'
   };
@@ -203,12 +204,12 @@ export default function Dashboard({ user }) {
                             onChange={(e) => setDestination(e.target.value)} style={inputStyle} required aria-required="true" />
                         </div>
                         <div style={{ display: 'flex', gap: '0.75rem' }}>
-                          <div style={{ flex: 1 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
                             <label htmlFor="startDate" style={labelStyle}>Start Date *</label>
                             <input id="startDate" type="date" value={startDate}
                               onChange={(e) => setStartDate(e.target.value)} style={inputStyle} required aria-required="true" />
                           </div>
-                          <div style={{ flex: 1 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
                             <label htmlFor="endDate" style={labelStyle}>End Date *</label>
                             <input id="endDate" type="date" value={endDate}
                               onChange={(e) => setEndDate(e.target.value)} style={inputStyle} required aria-required="true" />
@@ -243,7 +244,7 @@ export default function Dashboard({ user }) {
                         style={{ background: 'white', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}
                       >
                         <div style={{ display: 'flex', gap: '0.75rem' }}>
-                          <div style={{ flex: 1 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
                             <label htmlFor="budget" style={labelStyle}>Budget</label>
                             <select id="budget" value={budgetLevel} onChange={(e) => setBudgetLevel(e.target.value)} style={inputStyle}>
                               <option value="budget">💰 Budget</option>
@@ -251,7 +252,7 @@ export default function Dashboard({ user }) {
                               <option value="luxury">💎 Luxury</option>
                             </select>
                           </div>
-                          <div style={{ flex: 1 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
                             <label htmlFor="traveler" style={labelStyle}>Traveler</label>
                             <select id="traveler" value={travelerType} onChange={(e) => setTravelerType(e.target.value)} style={inputStyle}>
                               <option value="solo">🧑 Solo</option>
