@@ -1,15 +1,9 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import {
-  APIProvider,
-  Map,
-  AdvancedMarker,
-  InfoWindow,
-  useMap,
-} from '@vis.gl/react-google-maps';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 
 /**
  * ItineraryMap — Renders a Google Map with markers for the active day's
- * activities and meals. Automatically fits bounds to show all pins.
+ * activities and meals. Uses vanilla Google Maps JS API (no mapId required).
+ * Automatically fits bounds to show all pins.
  */
 
 // Category → emoji mapping for marker labels
@@ -31,127 +25,44 @@ const MEAL_EMOJI = {
   default: '🍴',
 };
 
-// Color palette for markers
+// Color palette
 const ACTIVITY_COLOR = '#4A90E2';
 const MEAL_COLOR = '#FFD166';
 
-// Auto-fit bounds when markers change
-function MapBoundsController({ markers }) {
-  const map = useMap();
+/**
+ * Load the Google Maps JS API script exactly once.
+ * Returns a promise that resolves when `window.google.maps` is ready.
+ */
+let _loadPromise = null;
+function loadGoogleMaps(apiKey) {
+  if (window.google && window.google.maps) {
+    return Promise.resolve();
+  }
+  if (_loadPromise) return _loadPromise;
 
-  useEffect(() => {
-    if (!map || !markers || markers.length === 0) return;
+  _loadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker&v=weekly`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Google Maps script failed to load'));
+    document.head.appendChild(script);
+  });
 
-    const bounds = new window.google.maps.LatLngBounds();
-    markers.forEach((m) => {
-      if (m.lat && m.lng) {
-        bounds.extend({ lat: m.lat, lng: m.lng });
-      }
-    });
-
-    // Add some padding
-    map.fitBounds(bounds, { top: 50, bottom: 50, left: 50, right: 50 });
-
-    // Don't zoom in too much for a single marker
-    const listener = map.addListener('idle', () => {
-      if (map.getZoom() > 16) map.setZoom(16);
-      window.google.maps.event.removeListener(listener);
-    });
-  }, [map, markers]);
-
-  return null;
-}
-
-function MarkerWithInfo({ marker, isActive, onSelect, onDeselect }) {
-  const isActivity = marker.type === 'activity';
-  const emoji = isActivity
-    ? CATEGORY_EMOJI[marker.category] || CATEGORY_EMOJI.default
-    : MEAL_EMOJI[marker.mealType] || MEAL_EMOJI.default;
-
-  return (
-    <>
-      <AdvancedMarker
-        position={{ lat: marker.lat, lng: marker.lng }}
-        onClick={() => onSelect(marker.id)}
-        title={marker.name}
-      >
-        <div
-          style={{
-            background: isActivity ? ACTIVITY_COLOR : MEAL_COLOR,
-            color: isActivity ? '#fff' : '#1a1a1a',
-            border: '3px solid #1a1a1a',
-            borderRadius: '50%',
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.2rem',
-            boxShadow: '3px 3px 0px #1a1a1a',
-            cursor: 'pointer',
-            transition: 'transform 0.15s',
-            transform: isActive ? 'scale(1.3)' : 'scale(1)',
-          }}
-        >
-          {emoji}
-        </div>
-      </AdvancedMarker>
-
-      {isActive && (
-        <InfoWindow
-          position={{ lat: marker.lat, lng: marker.lng }}
-          onCloseClick={() => onDeselect()}
-          pixelOffset={[0, -45]}
-        >
-          <div
-            style={{
-              fontFamily: "'Nunito', sans-serif",
-              padding: '4px',
-              maxWidth: '220px',
-            }}
-          >
-            <div
-              style={{
-                fontFamily: "'Caveat', cursive",
-                fontSize: '1.3rem',
-                fontWeight: 'bold',
-                marginBottom: '4px',
-                color: '#1a1a1a',
-              }}
-            >
-              {emoji} {marker.name}
-            </div>
-            {marker.time && (
-              <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: '2px' }}>
-                🕐 {marker.time}
-              </div>
-            )}
-            {marker.description && (
-              <div style={{ fontSize: '0.85rem', color: '#333', marginBottom: '4px' }}>
-                {marker.description}
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: '8px', fontSize: '0.85rem', fontWeight: 'bold' }}>
-              {marker.cost != null && <span>💵 ${marker.cost}</span>}
-              {marker.duration && <span>⏱️ {marker.duration}h</span>}
-            </div>
-            {marker.location && (
-              <div style={{ fontSize: '0.75rem', color: '#888', marginTop: '4px' }}>
-                📍 {marker.location}
-              </div>
-            )}
-          </div>
-        </InfoWindow>
-      )}
-    </>
-  );
+  return _loadPromise;
 }
 
 export default function ItineraryMap({ day, mapsApiKey, destination }) {
-  const [activeMarkerId, setActiveMarkerId] = useState(null);
+  const mapRef = useRef(null);
+  const mapContainerRef = useRef(null);
+  const markersRef = useRef([]);
+  const infoWindowRef = useRef(null);
+  const [mapReady, setMapReady] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   // Build markers array from day activities + meals
-  const markers = useMemo(() => {
+  const markerData = useMemo(() => {
     if (!day) return [];
     const result = [];
 
@@ -193,10 +104,124 @@ export default function ItineraryMap({ day, mapsApiKey, destination }) {
     return result;
   }, [day]);
 
-  // Reset active marker when day changes
+  // Load Google Maps script
   useEffect(() => {
-    setActiveMarkerId(null);
-  }, [day]);
+    if (!mapsApiKey) return;
+    loadGoogleMaps(mapsApiKey)
+      .then(() => setMapReady(true))
+      .catch(() => setLoadError(true));
+  }, [mapsApiKey]);
+
+  // Initialize map once script is loaded
+  useEffect(() => {
+    if (!mapReady || !mapContainerRef.current) return;
+    if (mapRef.current) return; // Already initialized
+
+    const defaultCenter = markerData.length > 0
+      ? { lat: markerData[0].lat, lng: markerData[0].lng }
+      : { lat: 35.6762, lng: 139.6503 };
+
+    mapRef.current = new window.google.maps.Map(mapContainerRef.current, {
+      center: defaultCenter,
+      zoom: 13,
+      gestureHandling: 'cooperative',
+      mapTypeControl: true,
+      streetViewControl: false,
+      fullscreenControl: true,
+      zoomControl: true,
+      styles: [
+        {
+          featureType: 'poi',
+          elementType: 'labels',
+          stylers: [{ visibility: 'on' }],
+        },
+      ],
+    });
+
+    infoWindowRef.current = new window.google.maps.InfoWindow();
+  }, [mapReady]);
+
+  // Update markers whenever markerData changes
+  useEffect(() => {
+    if (!mapRef.current || !window.google) return;
+
+    // Clear old markers
+    markersRef.current.forEach((m) => m.setMap(null));
+    markersRef.current = [];
+
+    if (markerData.length === 0) return;
+
+    const bounds = new window.google.maps.LatLngBounds();
+    const infoWindow = infoWindowRef.current;
+
+    markerData.forEach((item) => {
+      const isActivity = item.type === 'activity';
+      const emoji = isActivity
+        ? CATEGORY_EMOJI[item.category] || CATEGORY_EMOJI.default
+        : MEAL_EMOJI[item.mealType] || MEAL_EMOJI.default;
+
+      const marker = new window.google.maps.Marker({
+        position: { lat: item.lat, lng: item.lng },
+        map: mapRef.current,
+        title: item.name,
+        label: {
+          text: emoji,
+          fontSize: '18px',
+        },
+        icon: {
+          path: window.google.maps.SymbolPath.CIRCLE,
+          fillColor: isActivity ? ACTIVITY_COLOR : MEAL_COLOR,
+          fillOpacity: 1,
+          strokeColor: '#1a1a1a',
+          strokeWeight: 2.5,
+          scale: 18,
+        },
+      });
+
+      // Build info window content
+      let content = `
+        <div style="font-family: 'Nunito', Arial, sans-serif; padding: 4px; max-width: 220px;">
+          <div style="font-family: 'Caveat', cursive, sans-serif; font-size: 1.3rem; font-weight: bold; margin-bottom: 4px; color: #1a1a1a;">
+            ${emoji} ${item.name}
+          </div>
+      `;
+      if (item.time) {
+        content += `<div style="font-size: 0.85rem; color: #555; margin-bottom: 2px;">🕐 ${item.time}</div>`;
+      }
+      if (item.description) {
+        content += `<div style="font-size: 0.85rem; color: #333; margin-bottom: 4px;">${item.description}</div>`;
+      }
+      const details = [];
+      if (item.cost != null) details.push(`💵 $${item.cost}`);
+      if (item.duration) details.push(`⏱️ ${item.duration}h`);
+      if (details.length > 0) {
+        content += `<div style="display: flex; gap: 8px; font-size: 0.85rem; font-weight: bold;">${details.join(' ')}</div>`;
+      }
+      if (item.location) {
+        content += `<div style="font-size: 0.75rem; color: #888; margin-top: 4px;">📍 ${item.location}</div>`;
+      }
+      content += '</div>';
+
+      marker.addListener('click', () => {
+        infoWindow.setContent(content);
+        infoWindow.open(mapRef.current, marker);
+      });
+
+      bounds.extend({ lat: item.lat, lng: item.lng });
+      markersRef.current.push(marker);
+    });
+
+    // Fit bounds
+    mapRef.current.fitBounds(bounds, { top: 50, bottom: 50, left: 50, right: 50 });
+
+    // Don't zoom in too much for single marker
+    const listener = mapRef.current.addListener('idle', () => {
+      if (mapRef.current.getZoom() > 16) mapRef.current.setZoom(16);
+      window.google.maps.event.removeListener(listener);
+    });
+  }, [markerData, mapReady]);
+
+  // --- Render states ---
 
   if (!mapsApiKey) {
     return (
@@ -216,7 +241,25 @@ export default function ItineraryMap({ day, mapsApiKey, destination }) {
     );
   }
 
-  if (markers.length === 0) {
+  if (loadError) {
+    return (
+      <div
+        className="comic-box"
+        style={{
+          padding: '2rem',
+          textAlign: 'center',
+          background: 'var(--paper-white)',
+        }}
+      >
+        <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>⚠️</div>
+        <p className="cartoon-font" style={{ color: 'var(--marker-red)', fontSize: '1.3rem' }}>
+          Failed to load Google Maps. Check the API key and try refreshing.
+        </p>
+      </div>
+    );
+  }
+
+  if (markerData.length === 0) {
     return (
       <div
         className="comic-box"
@@ -233,10 +276,6 @@ export default function ItineraryMap({ day, mapsApiKey, destination }) {
       </div>
     );
   }
-
-  const defaultCenter = markers.length > 0
-    ? { lat: markers[0].lat, lng: markers[0].lng }
-    : { lat: 35.6762, lng: 139.6503 };
 
   return (
     <div
@@ -304,28 +343,20 @@ export default function ItineraryMap({ day, mapsApiKey, destination }) {
         </div>
       </div>
 
-      <div style={{ height: '380px', width: '100%', position: 'relative' }}>
-        <APIProvider apiKey={mapsApiKey}>
-          <Map
-            defaultCenter={defaultCenter}
-            defaultZoom={13}
-            mapId="DEMO_MAP_ID"
-            gestureHandling="cooperative"
-            disableDefaultUI={false}
-            style={{ width: '100%', height: '100%' }}
-          >
-            <MapBoundsController markers={markers} />
-            {markers.map((marker) => (
-              <MarkerWithInfo
-                key={marker.id}
-                marker={marker}
-                isActive={activeMarkerId === marker.id}
-                onSelect={setActiveMarkerId}
-                onDeselect={() => setActiveMarkerId(null)}
-              />
-            ))}
-          </Map>
-        </APIProvider>
+      <div
+        ref={mapContainerRef}
+        style={{ height: '380px', width: '100%', position: 'relative' }}
+        aria-label={`Map showing Day ${day.day} activities and meals`}
+        role="application"
+      >
+        {!mapReady && (
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            height: '100%', fontFamily: "'Nunito', sans-serif", color: 'var(--text-secondary)',
+          }}>
+            Loading map...
+          </div>
+        )}
       </div>
     </div>
   );
