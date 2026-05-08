@@ -104,7 +104,7 @@ h1, h2, h3, h4, h5, h6, .cartoon-font {
 .plane-follower {
   position: absolute;
   top: 0; left: 0;
-  offset-path: path('M -200 400 Q 300 -100, 700 200 T 1400 -50');
+  offset-path: path('M -200 400 Q 300 -100, 700 200 T 1400 600 T 200 1200 T 1000 1800');
   animation: flyAlongPath 12s linear infinite;
   offset-rotate: auto;
   z-index: -1;

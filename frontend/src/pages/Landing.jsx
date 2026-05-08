@@ -48,14 +48,21 @@ export default function Landing({ onLoginSuccess }) {
 
     doodlesRef.current.forEach((doodle, i) => {
       if(!doodle) return;
+      
+      // Randomize animations so they are independent
+      const randomX = Math.random() * 40 - 20;
+      const randomY = Math.random() * 40 - 20;
+      const randomRot = Math.random() * 20 - 10;
+      const duration = Math.random() * 4 + 3;
+
       if (doodle.classList.contains('drift')) {
-        gsap.to(doodle, { x: '+=20', y: '+=15', rotation: '+=5', duration: 4 + i, yoyo: true, repeat: -1, ease: "sine.inOut" });
+        gsap.to(doodle, { x: randomX, y: randomY, rotation: randomRot, duration: duration, yoyo: true, repeat: -1, ease: "sine.inOut" });
       }
       if (doodle.classList.contains('pulse')) {
-        gsap.to(doodle, { scale: 1.2, rotation: 45, duration: 2 + i, yoyo: true, repeat: -1, ease: "sine.inOut" });
+        gsap.to(doodle, { scale: 1.3, rotation: randomRot * 2, duration: duration, yoyo: true, repeat: -1, ease: "sine.inOut" });
       }
       if (doodle.classList.contains('wiggle')) {
-        gsap.to(doodle, { rotation: 10, x: 5, duration: 1 + (i*0.2), yoyo: true, repeat: -1, ease: "sine.inOut" });
+        gsap.to(doodle, { rotation: randomRot * 3, x: randomX / 2, duration: duration / 2, yoyo: true, repeat: -1, ease: "sine.inOut" });
       }
     });
 
@@ -99,25 +106,36 @@ export default function Landing({ onLoginSuccess }) {
 
       <main style={{ paddingBottom: '6rem', position: 'relative', overflowX: 'hidden' }} ref={containerRef}>
         
-        {/* STORYTELLING SCENERY (Behind Hero) */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '800px', zIndex: -1, pointerEvents: 'none' }}>
+        {/* STORYTELLING SCENERY (Spanning Full Height of Document) */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', minHeight: '2000px', zIndex: -1, pointerEvents: 'none' }}>
           
-          {/* Hand-drawn SVG Mountains & Sun */}
-          <svg style={{ position: 'absolute', width: '100%', height: '100%' }}>
-            {/* Massive flight path */}
-            <path d="M -200 400 Q 300 -100, 700 200 T 1400 -50" fill="transparent" stroke="var(--marker-blue)" strokeWidth="3" strokeDasharray="12 12" opacity={0.6} />
+          <svg style={{ position: 'absolute', width: '100%', height: '100%', minHeight: '2000px', overflow: 'visible' }}>
+            {/* Massive flight path spanning entire site */}
+            <path d="M -200 400 Q 300 -100, 700 200 T 1400 600 T 200 1200 T 1000 1800" fill="transparent" stroke="var(--marker-blue)" strokeWidth="3" strokeDasharray="12 12" opacity={0.6} />
             
-            {/* Mountains Bottom Left */}
+            {/* Mountains Bottom Left of Hero */}
             <path d="M -50 500 Q 100 350, 250 500 T 500 500" fill="transparent" stroke="var(--ink-black)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity={0.3} />
             <path d="M 50 500 Q 200 300, 350 500" fill="transparent" stroke="var(--ink-black)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity={0.3} />
             
             {/* Hand-drawn Sun Top Right */}
-            <circle cx="85%" cy="15%" r="40" fill="transparent" stroke="var(--marker-yellow)" strokeWidth="4" />
-            <path d="M 85% 5% L 85% 0% M 85% 25% L 85% 30% M 75% 15% L 70% 15% M 95% 15% L 100% 15% M 78% 8% L 73% 3% M 92% 22% L 97% 27% M 92% 8% L 97% 3% M 78% 22% L 73% 27%" stroke="var(--marker-yellow)" strokeWidth="4" strokeLinecap="round" />
+            <circle cx="85%" cy="150" r="40" fill="transparent" stroke="var(--marker-yellow)" strokeWidth="4" />
+            <path d="M 85% 90 L 85% 60 M 85% 210 L 85% 240 M 75% 150 L 70% 150 M 95% 150 L 100% 150 M 78% 108 L 73% 78 M 92% 192 L 97% 222 M 92% 108 L 97% 78 M 78% 192 L 73% 222" stroke="var(--marker-yellow)" strokeWidth="4" strokeLinecap="round" />
             
-            {/* Arrows pointing to the logo */}
-            <path d="M 40% 10% Q 45% 20%, 48% 28%" fill="transparent" stroke="var(--marker-red)" strokeWidth="3" strokeLinecap="round" />
-            <polygon points="46%,26% 48%,28% 49%,25%" fill="var(--marker-red)" />
+            {/* A LOT OF ARROWS POINTING TO TRAVI LOGO (Approx center 300px down) */}
+            <path d="M 10% 200 Q 30% 250, 40% 280" fill="transparent" stroke="var(--marker-red)" strokeWidth="3" strokeLinecap="round" opacity={0.7} />
+            <polygon points="38%,278 40%,280 39%,274" fill="var(--marker-red)" opacity={0.7} />
+
+            <path d="M 90% 100 Q 70% 200, 60% 250" fill="transparent" stroke="var(--marker-green)" strokeWidth="3" strokeLinecap="round" opacity={0.7} />
+            <polygon points="62%,248 60%,250 61%,244" fill="var(--marker-green)" opacity={0.7} />
+
+            <path d="M 50% 50 Q 55% 150, 52% 220" fill="transparent" stroke="var(--marker-blue)" strokeWidth="4" strokeLinecap="round" strokeDasharray="5 5" opacity={0.7} />
+            <polygon points="50%,215 52%,220 54%,215" fill="var(--marker-blue)" opacity={0.7} />
+
+            <path d="M 20% 500 Q 35% 400, 45% 350" fill="transparent" stroke="var(--marker-yellow)" strokeWidth="4" strokeLinecap="round" opacity={0.8} />
+            <polygon points="43%,352 45%,350 44%,356" fill="var(--marker-yellow)" opacity={0.8} />
+
+            <path d="M 80% 600 Q 65% 450, 55% 350" fill="transparent" stroke="var(--ink-black)" strokeWidth="2" strokeLinecap="round" opacity={0.5} />
+            <polygon points="57%,352 55%,350 56%,356" fill="var(--ink-black)" opacity={0.5} />
           </svg>
 
           {/* Plane following the SVG path (CSS offset-path animation) */}
@@ -125,63 +143,86 @@ export default function Landing({ onLoginSuccess }) {
             <Plane size={32} color="var(--marker-red)" fill="var(--marker-red)" style={{ transform: 'rotate(45deg)' }} />
           </div>
 
-          {/* Story Stops on the path */}
+          {/* Story Stops scattered down the page */}
           <div className="wiggle" style={{ position: 'absolute', top: '380px', left: '10%' }}>
             <Home size={40} color="var(--ink-black)" fill="var(--paper-white)" strokeWidth={1.5} />
             <div className="cartoon-font" style={{ position: 'absolute', top: '-25px', left: '20px', color: 'var(--text-secondary)' }}>Zzz...</div>
           </div>
           
-          <div className="drift" style={{ position: 'absolute', top: '150px', left: '65%' }}>
+          <div className="drift" style={{ position: 'absolute', top: '800px', left: '75%' }}>
             <MapPin size={48} color="var(--marker-red)" fill="var(--paper-white)" strokeWidth={1.5} />
-            <div className="cartoon-font" style={{ position: 'absolute', top: '-30px', left: '-20px', color: 'var(--marker-red)', fontSize: '1.5rem', whiteSpace: 'nowrap', transform: 'rotate(-5deg)' }}>Destination!</div>
+            <div className="cartoon-font" style={{ position: 'absolute', top: '-30px', left: '-20px', color: 'var(--marker-red)', fontSize: '1.5rem', whiteSpace: 'nowrap', transform: 'rotate(-5deg)' }}>Pit Stop!</div>
           </div>
 
-          {/* DENSE ICON EXPLOSION */}
-          {/* Left Side */}
-          <div ref={el => doodlesRef.current[0] = el} className="drift" style={{ position: 'absolute', top: '15%', left: '5%', opacity: 0.4, transform: 'rotate(-15deg)' }}>
-            <Camera size={50} color="var(--marker-blue)" />
+          <div className="pulse" style={{ position: 'absolute', top: '1500px', left: '15%' }}>
+            <MapPin size={60} color="var(--marker-green)" fill="var(--paper-white)" strokeWidth={2} />
+            <div className="cartoon-font" style={{ position: 'absolute', top: '-35px', left: '-10px', color: 'var(--marker-green)', fontSize: '2rem', whiteSpace: 'nowrap', transform: 'rotate(5deg)' }}>Final Destination!</div>
           </div>
-          <div ref={el => doodlesRef.current[1] = el} className="pulse" style={{ position: 'absolute', top: '30%', left: '25%', opacity: 0.5 }}>
+
+          {/* DENSE ICON EXPLOSION ACROSS ENTIRE VIEWPORT WIDTH & HEIGHT */}
+          
+          {/* Top Section */}
+          <div ref={el => doodlesRef.current.push(el)} className="drift" style={{ position: 'absolute', top: '5%', left: '-5%', opacity: 0.4, transform: 'rotate(-15deg)' }}>
+            <Camera size={60} color="var(--marker-blue)" />
+          </div>
+          <div ref={el => doodlesRef.current.push(el)} className="pulse" style={{ position: 'absolute', top: '10%', right: '2%', opacity: 0.5 }}>
             <Star size={30} color="var(--marker-yellow)" fill="var(--marker-yellow)" />
           </div>
-          <div ref={el => doodlesRef.current[2] = el} className="wiggle" style={{ position: 'absolute', top: '65%', left: '8%', opacity: 0.4, transform: 'rotate(10deg)' }}>
-            <Luggage size={60} color="var(--marker-green)" />
-          </div>
-          <div ref={el => doodlesRef.current[3] = el} className="drift" style={{ position: 'absolute', top: '80%', left: '20%', opacity: 0.3, transform: 'rotate(-25deg)' }}>
+          <div ref={el => doodlesRef.current.push(el)} className="drift" style={{ position: 'absolute', top: '20%', left: '15%', opacity: 0.3, transform: 'rotate(-25deg)' }}>
             <Ticket size={45} color="var(--marker-red)" />
           </div>
 
-          {/* Right Side */}
-          <div ref={el => doodlesRef.current[4] = el} className="drift" style={{ position: 'absolute', top: '25%', right: '8%', opacity: 0.4, transform: 'rotate(20deg)' }}>
-            <Compass size={65} color="var(--ink-black)" />
+          {/* Middle Section (Around UI Demo) */}
+          <div ref={el => doodlesRef.current.push(el)} className="drift" style={{ position: 'absolute', top: '650px', left: '3%', opacity: 0.4, transform: 'rotate(20deg)' }}>
+            <Compass size={85} color="var(--ink-black)" strokeWidth={1} />
           </div>
-          <div ref={el => doodlesRef.current[5] = el} className="pulse" style={{ position: 'absolute', top: '50%', right: '20%', opacity: 0.4 }}>
-            <Star size={24} color="var(--marker-red)" fill="var(--marker-red)" />
+          <div ref={el => doodlesRef.current.push(el)} className="pulse" style={{ position: 'absolute', top: '700px', right: '-2%', opacity: 0.4 }}>
+            <Star size={40} color="var(--marker-red)" fill="var(--marker-red)" />
           </div>
-          <div ref={el => doodlesRef.current[6] = el} className="drift" style={{ position: 'absolute', top: '75%', right: '10%', opacity: 0.3, transform: 'rotate(-10deg)' }}>
-            <Coffee size={50} color="var(--marker-blue)" />
+          <div ref={el => doodlesRef.current.push(el)} className="wiggle" style={{ position: 'absolute', top: '850px', left: '85%', opacity: 0.4, transform: 'rotate(10deg)' }}>
+            <Luggage size={70} color="var(--marker-green)" />
           </div>
-          <div ref={el => doodlesRef.current[7] = el} className="wiggle" style={{ position: 'absolute', top: '10%', right: '25%', opacity: 0.5, transform: 'rotate(15deg)' }}>
-            <TreePalm size={55} color="var(--marker-green)" />
+          <div ref={el => doodlesRef.current.push(el)} className="drift" style={{ position: 'absolute', top: '900px', left: '-4%', opacity: 0.3, transform: 'rotate(-10deg)' }}>
+            <Coffee size={60} color="var(--marker-blue)" />
+          </div>
+
+          {/* Bottom Section (Around Feature Cards) */}
+          <div ref={el => doodlesRef.current.push(el)} className="wiggle" style={{ position: 'absolute', top: '1300px', right: '5%', opacity: 0.5, transform: 'rotate(15deg)' }}>
+            <TreePalm size={80} color="var(--marker-green)" />
+          </div>
+          <div ref={el => doodlesRef.current.push(el)} className="drift" style={{ position: 'absolute', top: '1400px', left: '5%', opacity: 0.5, transform: 'rotate(-20deg)' }}>
+            <Camera size={55} color="var(--marker-yellow)" />
+          </div>
+          <div ref={el => doodlesRef.current.push(el)} className="pulse" style={{ position: 'absolute', top: '1600px', right: '15%', opacity: 0.3 }}>
+            <Star size={25} color="var(--marker-blue)" fill="var(--marker-blue)" />
+          </div>
+          <div ref={el => doodlesRef.current.push(el)} className="drift" style={{ position: 'absolute', top: '1500px', right: '-5%', opacity: 0.4, transform: 'rotate(20deg)' }}>
+            <Ticket size={70} color="var(--ink-black)" />
           </div>
 
           {/* Clouds */}
-          <div ref={el => doodlesRef.current[8] = el} className="drift" style={{ position: 'absolute', top: '40%', left: '8%', opacity: 0.2, transform: 'rotate(5deg)' }}>
-            <Cloud size={80} color="var(--marker-blue)" fill="var(--paper-white)" strokeWidth={1} />
+          <div ref={el => doodlesRef.current.push(el)} className="drift" style={{ position: 'absolute', top: '400px', left: '-5%', opacity: 0.2, transform: 'rotate(5deg)' }}>
+            <Cloud size={120} color="var(--marker-blue)" fill="var(--paper-white)" strokeWidth={1} />
           </div>
-          <div ref={el => doodlesRef.current[9] = el} className="drift" style={{ position: 'absolute', top: '15%', right: '35%', opacity: 0.2, transform: 'rotate(-5deg)' }}>
+          <div ref={el => doodlesRef.current.push(el)} className="drift" style={{ position: 'absolute', top: '1000px', right: '-8%', opacity: 0.2, transform: 'rotate(-5deg)' }}>
+            <Cloud size={150} color="var(--marker-blue)" fill="var(--paper-white)" strokeWidth={1} />
+          </div>
+          <div ref={el => doodlesRef.current.push(el)} className="drift" style={{ position: 'absolute', top: '1800px', left: '10%', opacity: 0.2, transform: 'rotate(8deg)' }}>
             <Cloud size={100} color="var(--marker-blue)" fill="var(--paper-white)" strokeWidth={1} />
           </div>
 
           {/* Handwritten Text Annotations */}
-          <div className="cartoon-font drift" style={{ position: 'absolute', top: '20%', left: '15%', fontSize: '2rem', color: 'var(--text-secondary)', transform: 'rotate(-15deg)' }}>
+          <div className="cartoon-font drift" style={{ position: 'absolute', top: '200px', left: '5%', fontSize: '2rem', color: 'var(--text-secondary)', transform: 'rotate(-15deg)' }}>
             Pack your bags!
           </div>
-          <div className="cartoon-font drift" style={{ position: 'absolute', top: '65%', right: '15%', fontSize: '2.5rem', color: 'var(--marker-blue)', transform: 'rotate(10deg)' }}>
+          <div className="cartoon-font drift" style={{ position: 'absolute', top: '600px', right: '5%', fontSize: '2.5rem', color: 'var(--marker-blue)', transform: 'rotate(10deg)' }}>
             Let's go! <ArrowRight size={24} style={{display: 'inline', verticalAlign: 'middle'}}/>
           </div>
-          <div className="cartoon-font wiggle" style={{ position: 'absolute', top: '85%', left: '30%', fontSize: '1.8rem', color: 'var(--marker-green)', transform: 'rotate(-5deg)' }}>
+          <div className="cartoon-font wiggle" style={{ position: 'absolute', top: '1200px', left: '8%', fontSize: '2.2rem', color: 'var(--marker-green)', transform: 'rotate(-5deg)' }}>
             Adventure awaits!
+          </div>
+          <div className="cartoon-font drift" style={{ position: 'absolute', top: '1700px', right: '10%', fontSize: '2.2rem', color: 'var(--marker-red)', transform: 'rotate(8deg)' }}>
+            Best trip ever!
           </div>
         </div>
 
@@ -195,7 +236,8 @@ export default function Landing({ onLoginSuccess }) {
           textAlign: 'center',
           paddingTop: '6rem',
           paddingBottom: '2rem',
-          position: 'relative'
+          position: 'relative',
+          zIndex: 10
         }}>
           
           <motion.div 
@@ -250,7 +292,7 @@ export default function Landing({ onLoginSuccess }) {
         </section>
 
         {/* 2. Interactive "Scrapbook" UI Demo */}
-        <section style={{ padding: '4rem 0', display: 'flex', justifyContent: 'center', perspective: '1200px' }}>
+        <section style={{ padding: '4rem 0', display: 'flex', justifyContent: 'center', perspective: '1200px', zIndex: 10 }}>
           <motion.div 
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
@@ -314,7 +356,7 @@ export default function Landing({ onLoginSuccess }) {
         </section>
 
         {/* 3. 2x2 Feature Cards Grid */}
-        <section style={{ paddingTop: '2rem' }}>
+        <section style={{ paddingTop: '2rem', zIndex: 10, position: 'relative' }}>
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <h2 style={{ fontSize: '3.5rem', marginBottom: '1rem', color: 'var(--ink-black)' }}>
               Superpowers Included!
