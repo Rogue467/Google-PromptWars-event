@@ -1,28 +1,76 @@
 import React, { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import gsap from 'gsap';
-import { Zap, Map, Shield, Cloud, Plane, MapPin, Sparkles } from 'lucide-react';
+import { Zap, Map, Shield, Cloud, Plane, MapPin, Sparkles, Star, Navigation } from 'lucide-react';
 import Login from '../components/Login';
 
 export default function Landing({ onLoginSuccess }) {
   const containerRef = useRef(null);
   const cardsRef = useRef([]);
+  const doodlesRef = useRef([]);
+  const uiElementsRef = useRef([]);
+
+  // 3D Tilt for UI Display
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useTransform(y, [-200, 200], [25, -25]); // Highly reactive 3D tilt
+  const rotateY = useTransform(x, [-200, 200], [-25, 25]);
+
+  const handleMouseMove = (event) => {
+    // Only capture movement on the UI container
+    const rect = event.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set(event.clientX - centerX);
+    y.set(event.clientY - centerY);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   useEffect(() => {
-    // GSAP Bouncy Entry Animation for the whole container
+    // 1. Initial Bouncy Load
     gsap.fromTo(containerRef.current.children, 
-      { y: 50, opacity: 0, rotation: () => Math.random() * 10 - 5 },
-      { y: 0, opacity: 1, rotation: 0, duration: 1, stagger: 0.2, ease: "elastic.out(1, 0.5)" }
+      { y: 60, opacity: 0, scale: 0.9, rotation: () => Math.random() * 10 - 5 },
+      { y: 0, opacity: 1, scale: 1, rotation: 0, duration: 1.2, stagger: 0.15, ease: "elastic.out(1, 0.4)" }
     );
 
-    // GSAP Hover animations for cards
+    // 2. Continuous Doodle Animations
+    doodlesRef.current.forEach((doodle, i) => {
+      if(!doodle) return;
+      // Clouds drift
+      if (doodle.classList.contains('drift')) {
+        gsap.to(doodle, { x: '+=30', y: '-=10', duration: 4 + i, yoyo: true, repeat: -1, ease: "sine.inOut" });
+      }
+      // Stars pulse and rotate
+      if (doodle.classList.contains('pulse')) {
+        gsap.to(doodle, { scale: 1.3, rotation: 180, duration: 2 + i, yoyo: true, repeat: -1, ease: "sine.inOut" });
+      }
+    });
+
+    // 3. Card Micro-Interactions
     cardsRef.current.forEach(card => {
       if(!card) return;
       card.addEventListener('mouseenter', () => {
-        gsap.to(card, { scale: 1.05, rotation: Math.random() * 4 - 2, duration: 0.3, ease: "back.out(1.7)" });
+        gsap.to(card, { scale: 1.06, y: -10, rotation: Math.random() * 6 - 3, duration: 0.4, ease: "back.out(2)" });
       });
       card.addEventListener('mouseleave', () => {
-        gsap.to(card, { scale: 1, rotation: 0, duration: 0.3, ease: "back.out(1.7)" });
+        gsap.to(card, { scale: 1, y: 0, rotation: 0, duration: 0.4, ease: "back.out(2)" });
+      });
+    });
+
+    // 4. UI Elements Micro-Interactions (Inside the demo window)
+    uiElementsRef.current.forEach(el => {
+      if(!el) return;
+      el.addEventListener('mouseenter', () => {
+        gsap.to(el, { x: 10, backgroundColor: '#f0f0f0', duration: 0.2, ease: "power2.out" });
+        gsap.to(el.querySelector('svg'), { scale: 1.5, y: -5, duration: 0.3, ease: "back.out(3)" });
+      });
+      el.addEventListener('mouseleave', () => {
+        gsap.to(el, { x: 0, backgroundColor: 'transparent', duration: 0.2, ease: "power2.out" });
+        gsap.to(el.querySelector('svg'), { scale: 1, y: 0, duration: 0.3, ease: "back.out(3)" });
       });
     });
   }, []);
@@ -32,27 +80,46 @@ export default function Landing({ onLoginSuccess }) {
   };
 
   return (
-    <main style={{ paddingBottom: '6rem', position: 'relative' }} ref={containerRef}>
+    <main style={{ paddingBottom: '6rem', position: 'relative', overflowX: 'hidden' }} ref={containerRef}>
       
-      {/* Background Doodles */}
-      <div style={{ position: 'absolute', top: '10%', left: '5%', opacity: 0.2, transform: 'rotate(-15deg)' }}>
-        <Cloud size={100} />
+      {/* Background Doodles (Animated by GSAP) */}
+      <div ref={el => doodlesRef.current[0] = el} className="drift" style={{ position: 'absolute', top: '10%', left: '5%', opacity: 0.3, transform: 'rotate(-15deg)', pointerEvents: 'none' }}>
+        <Cloud size={100} color="var(--marker-blue)" fill="var(--paper-white)" strokeWidth={1} />
       </div>
-      <div style={{ position: 'absolute', top: '40%', right: '10%', opacity: 0.2, transform: 'rotate(10deg)' }}>
-        <Cloud size={80} />
+      <div ref={el => doodlesRef.current[1] = el} className="drift" style={{ position: 'absolute', top: '40%', right: '8%', opacity: 0.2, transform: 'rotate(10deg)', pointerEvents: 'none' }}>
+        <Cloud size={80} color="var(--marker-blue)" fill="var(--paper-white)" strokeWidth={1} />
+      </div>
+      <div ref={el => doodlesRef.current[2] = el} className="pulse" style={{ position: 'absolute', top: '25%', right: '20%', opacity: 0.5, pointerEvents: 'none' }}>
+        <Star size={30} color="var(--marker-yellow)" fill="var(--marker-yellow)" />
+      </div>
+      <div ref={el => doodlesRef.current[3] = el} className="pulse" style={{ position: 'absolute', top: '60%', left: '15%', opacity: 0.4, pointerEvents: 'none' }}>
+        <Star size={20} color="var(--marker-red)" fill="var(--marker-red)" />
+      </div>
+      <div ref={el => doodlesRef.current[4] = el} className="pulse" style={{ position: 'absolute', top: '80%', right: '25%', opacity: 0.6, pointerEvents: 'none' }}>
+        <Sparkles size={40} color="var(--marker-green)" />
       </div>
 
-      {/* SVG Flight Path (Framer Motion for ease of path drawing) */}
-      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1, pointerEvents: 'none' }}>
+      {/* SVG Flight Path Loop */}
+      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1, pointerEvents: 'none', overflow: 'visible' }}>
         <motion.path 
-          d="M -100 200 Q 300 50, 600 300 T 1200 100" 
+          d="M -100 200 Q 200 -50, 400 200 T 900 150 T 1400 400" 
           fill="transparent" 
           stroke="var(--marker-blue)" 
-          strokeWidth="4" 
+          strokeWidth="3" 
           strokeDasharray="10 15"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
-          transition={{ duration: 4, ease: "easeInOut", repeat: Infinity, repeatType: "loop", repeatDelay: 1 }}
+          transition={{ duration: 6, ease: "linear", repeat: Infinity }}
+        />
+        <motion.path 
+          d="M 1200 800 Q 800 1000, 400 700 T -100 900" 
+          fill="transparent" 
+          stroke="var(--marker-red)" 
+          strokeWidth="3" 
+          strokeDasharray="8 12"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 8, ease: "linear", repeat: Infinity }}
         />
       </svg>
 
@@ -69,23 +136,28 @@ export default function Landing({ onLoginSuccess }) {
       }}>
         
         {/* Fun Sticker Badge */}
-        <div style={{ 
-          background: 'var(--marker-yellow)', 
-          border: 'var(--border-thick)', 
-          padding: '8px 16px', 
-          borderRadius: '4px',
-          color: 'var(--ink-black)',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          boxShadow: '4px 4px 0px var(--ink-black)',
-          transform: 'rotate(-3deg)',
-          marginBottom: '2rem',
-          fontWeight: '800'
-        }}>
+        <motion.div 
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          whileTap={{ scale: 0.9 }}
+          style={{ 
+            background: 'var(--marker-yellow)', 
+            border: 'var(--border-thick)', 
+            padding: '8px 16px', 
+            borderRadius: '4px',
+            color: 'var(--ink-black)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '4px 4px 0px var(--ink-black)',
+            transform: 'rotate(-3deg)',
+            marginBottom: '2rem',
+            fontWeight: '800',
+            cursor: 'pointer'
+          }}
+        >
           <Sparkles size={18} fill="var(--ink-black)"/>
           Magic by Gemini
-        </div>
+        </motion.div>
         
         <h1 style={{ 
           fontSize: 'clamp(4rem, 10vw, 8rem)', 
@@ -100,7 +172,7 @@ export default function Landing({ onLoginSuccess }) {
         </h1>
         
         <p className="cartoon-font" style={{ 
-          fontSize: '2rem', 
+          fontSize: '2.2rem', 
           color: 'var(--text-secondary)', 
           maxWidth: '600px', 
           margin: '0 auto 3rem auto',
@@ -116,45 +188,78 @@ export default function Landing({ onLoginSuccess }) {
       </section>
 
       {/* 2. Interactive "Scrapbook" UI Demo */}
-      <section style={{ padding: '4rem 0', display: 'flex', justifyContent: 'center' }}>
-        <div 
+      <section style={{ padding: '4rem 0', display: 'flex', justifyContent: 'center', perspective: '1200px' }}>
+        <motion.div 
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
           onClick={promptLogin}
-          className="comic-box"
           style={{ 
             width: '100%',
             maxWidth: '900px',
-            cursor: 'pointer',
-            position: 'relative',
-            transform: 'rotate(1deg)'
+            rotateX: rotateX,
+            rotateY: rotateY,
+            transformStyle: 'preserve-3d',
+            cursor: 'pointer'
           }}
         >
-          {/* Tape Doodle */}
-          <div style={{ position: 'absolute', top: '-15px', left: '50%', transform: 'translateX(-50%) rotate(-2deg)', width: '100px', height: '30px', background: 'rgba(255,255,255,0.7)', border: '1px solid #ccc', boxShadow: '1px 1px 3px rgba(0,0,0,0.1)' }}></div>
-          
-          <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-            <span className="cartoon-font" style={{ fontSize: '1.5rem', color: 'var(--marker-blue)' }}>My Awesome Trip 🌴</span>
-          </div>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
-            {/* Itinerary List */}
-            <div style={{ border: '2px dashed var(--ink-black)', borderRadius: '8px', padding: '1rem' }}>
-              <div style={{ height: '20px', width: '60%', background: 'var(--marker-yellow)', borderRadius: '2px', marginBottom: '1.5rem', border: '1px solid var(--ink-black)' }} />
-              <div style={{ height: '40px', width: '100%', background: 'transparent', borderBottom: '2px solid #ddd', marginBottom: '1rem', display: 'flex', alignItems: 'center' }}><MapPin size={20} color="var(--marker-red)" style={{marginRight: '8px'}} /> Day 1</div>
-              <div style={{ height: '40px', width: '100%', background: 'transparent', borderBottom: '2px solid #ddd', marginBottom: '1rem', display: 'flex', alignItems: 'center' }}><MapPin size={20} color="var(--marker-blue)" style={{marginRight: '8px'}} /> Day 2</div>
-              <div style={{ height: '40px', width: '100%', background: 'transparent', borderBottom: '2px solid #ddd', display: 'flex', alignItems: 'center' }}><MapPin size={20} color="var(--marker-green)" style={{marginRight: '8px'}} /> Day 3</div>
+          <div className="comic-box" style={{ width: '100%', position: 'relative' }}>
+            {/* Tape Doodle */}
+            <div style={{ position: 'absolute', top: '-15px', left: '50%', transform: 'translateX(-50%) rotate(-2deg)', width: '100px', height: '30px', background: 'rgba(255,255,255,0.7)', border: '1px solid #ccc', boxShadow: '1px 1px 3px rgba(0,0,0,0.1)', zIndex: 10 }}></div>
+            
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <span className="cartoon-font" style={{ fontSize: '2rem', color: 'var(--marker-blue)' }}>My Awesome Trip 🌴</span>
             </div>
-            {/* Map Area */}
-            <div style={{ background: '#f0f0f0', border: '2px solid var(--ink-black)', borderRadius: '8px', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-               <Map size={64} color="var(--text-secondary)" />
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
+              {/* Itinerary List */}
+              <div style={{ border: '3px dashed var(--ink-black)', borderRadius: '12px', padding: '1rem', background: '#fff' }}>
+                <div style={{ height: '24px', width: '60%', background: 'var(--marker-yellow)', borderRadius: '4px', marginBottom: '1.5rem', border: '2px solid var(--ink-black)' }} />
+                
+                {/* Reactive Itinerary Items */}
+                <div ref={el => uiElementsRef.current[0] = el} style={{ padding: '0.5rem', borderRadius: '8px', borderBottom: '2px solid #ddd', marginBottom: '0.5rem', display: 'flex', alignItems: 'center' }}>
+                  <MapPin size={24} color="var(--marker-red)" style={{marginRight: '12px'}} /> <span style={{ fontWeight: 800 }}>Day 1: Arrival</span>
+                </div>
+                <div ref={el => uiElementsRef.current[1] = el} style={{ padding: '0.5rem', borderRadius: '8px', borderBottom: '2px solid #ddd', marginBottom: '0.5rem', display: 'flex', alignItems: 'center' }}>
+                  <MapPin size={24} color="var(--marker-blue)" style={{marginRight: '12px'}} /> <span style={{ fontWeight: 800 }}>Day 2: City Tour</span>
+                </div>
+                <div ref={el => uiElementsRef.current[2] = el} style={{ padding: '0.5rem', borderRadius: '8px', display: 'flex', alignItems: 'center' }}>
+                  <MapPin size={24} color="var(--marker-green)" style={{marginRight: '12px'}} /> <span style={{ fontWeight: 800 }}>Day 3: Relax</span>
+                </div>
+              </div>
+
+              {/* Map Area */}
+              <div style={{ background: '#f0f0f0', border: '3px solid var(--ink-black)', borderRadius: '12px', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                 <Map size={80} color="var(--text-secondary)" opacity={0.3} />
+                 {/* Map Path Doodle inside map */}
+                 <svg style={{ position: 'absolute', width: '100%', height: '100%' }}>
+                    <motion.path 
+                      d="M 50 150 Q 150 50, 250 150 T 450 100" 
+                      fill="transparent" 
+                      stroke="var(--marker-red)" 
+                      strokeWidth="4" 
+                      strokeDasharray="6 8"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 3, ease: "linear", repeat: Infinity }}
+                    />
+                 </svg>
+                 <motion.div 
+                    animate={{ y: [0, -10, 0] }} 
+                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                    style={{ position: 'absolute', top: '40%', left: '40%' }}
+                 >
+                    <Navigation size={32} color="var(--marker-blue)" fill="var(--marker-blue)" />
+                 </motion.div>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* 3. Bento Box Feature Cards */}
-      <section style={{ paddingTop: '4rem' }}>
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h2 style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--ink-black)' }}>
+      <section style={{ paddingTop: '2rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h2 style={{ fontSize: '3.5rem', marginBottom: '1rem', color: 'var(--ink-black)' }}>
             Superpowers Included!
           </h2>
         </div>
@@ -167,36 +272,39 @@ export default function Landing({ onLoginSuccess }) {
           margin: '0 auto'
         }}>
           {/* Feature 1 */}
-          <div ref={el => cardsRef.current[0] = el} className="comic-box comic-box-yellow" style={{ display: 'flex', flexDirection: 'column', minHeight: '220px' }}>
-            <Zap size={40} fill="var(--marker-yellow)" color="var(--ink-black)" style={{ marginBottom: '1rem' }} />
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Smart AI Magic</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.5', fontWeight: '600' }}>
-              Gemini reads your crazy constraints (vegan, $50 budget) and makes it work!
+          <div ref={el => cardsRef.current[0] = el} className="comic-box comic-box-yellow" style={{ display: 'flex', flexDirection: 'column', minHeight: '220px', transformOrigin: 'bottom center' }}>
+            <Zap size={48} fill="var(--marker-yellow)" color="var(--ink-black)" style={{ marginBottom: '1rem' }} />
+            <h3 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Smart AI Magic</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.5', fontWeight: '800' }}>
+              Gemini reads your crazy constraints (vegan, $50 budget) and makes it work effortlessly!
             </p>
           </div>
 
           {/* Feature 2 */}
-          <div ref={el => cardsRef.current[1] = el} className="comic-box comic-box-blue" style={{ display: 'flex', flexDirection: 'column', minHeight: '220px' }}>
-            <Cloud size={40} fill="var(--marker-blue)" color="var(--ink-black)" style={{ marginBottom: '1rem' }} />
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Rain? No Problem!</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.5', fontWeight: '600' }}>
-              Weather changes? We instantly swap your park picnic for a museum trip.
+          <div ref={el => cardsRef.current[1] = el} className="comic-box comic-box-blue" style={{ display: 'flex', flexDirection: 'column', minHeight: '220px', transformOrigin: 'bottom center' }}>
+            <Cloud size={48} fill="var(--marker-blue)" color="var(--ink-black)" style={{ marginBottom: '1rem' }} />
+            <h3 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Rain? No Problem!</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.5', fontWeight: '800' }}>
+              Weather changes? We instantly swap your park picnic for a museum trip in real-time.
             </p>
           </div>
 
           {/* Feature 3 */}
-          <div ref={el => cardsRef.current[2] = el} className="comic-box comic-box-green" style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: '2rem' }}>
+          <div ref={el => cardsRef.current[2] = el} className="comic-box comic-box-green" style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: '2rem', transformOrigin: 'center center' }}>
             <div style={{ flex: 1 }}>
-              <Shield size={40} fill="var(--marker-green)" color="var(--ink-black)" style={{ marginBottom: '1rem' }} />
-              <h3 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Fort Knox Security</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.5', fontWeight: '600' }}>
+              <Shield size={48} fill="var(--marker-green)" color="var(--ink-black)" style={{ marginBottom: '1.5rem' }} />
+              <h3 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Fort Knox Security</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', lineHeight: '1.5', fontWeight: '800' }}>
                 Your travel plans are safe with Firebase auth and Google Cloud Secret Manager. No peeking allowed!
               </p>
             </div>
             <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-              <div style={{ transform: 'rotate(5deg)', background: 'var(--paper-white)', padding: '1rem', border: '2px dashed var(--ink-black)', borderRadius: '8px' }}>
-                <span className="cartoon-font" style={{ fontSize: '1.5rem', color: 'var(--marker-green)' }}>Top Secret Plans 🤫</span>
-              </div>
+              <motion.div 
+                whileHover={{ rotate: [-5, 5, -5, 5, 0], scale: 1.1 }}
+                style={{ transform: 'rotate(5deg)', background: 'var(--paper-white)', padding: '1rem 2rem', border: '3px dashed var(--ink-black)', borderRadius: '12px' }}
+              >
+                <span className="cartoon-font" style={{ fontSize: '2rem', color: 'var(--marker-green)' }}>Top Secret Plans 🤫</span>
+              </motion.div>
             </div>
           </div>
         </div>
