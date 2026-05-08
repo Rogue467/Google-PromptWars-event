@@ -126,26 +126,39 @@ export default function Dashboard({ user }) {
   };
 
   const inputStyle = {
-    padding: '0.75rem', borderRadius: '8px',
-    border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(0,0,0,0.3)',
-    color: 'white', fontFamily: 'inherit', fontSize: '0.95rem', width: '100%',
+    padding: '0.75rem', 
+    borderRadius: '8px',
+    border: '2px solid var(--ink-black)', 
+    background: 'var(--paper-white)',
+    color: 'var(--ink-black)', 
+    fontFamily: 'Nunito, sans-serif', 
+    fontSize: '1rem', 
+    width: '100%',
+    boxShadow: '3px 3px 0px var(--ink-black)',
+    outline: 'none'
   };
-  const labelStyle = { fontSize: '0.85rem', color: '#aaa', marginBottom: '4px', display: 'block' };
+  const labelStyle = { 
+    fontSize: '1.2rem', 
+    color: 'var(--ink-black)', 
+    marginBottom: '8px', 
+    display: 'block',
+    fontFamily: 'Caveat, cursive'
+  };
 
   return (
     <main style={{ marginTop: '1.5rem', animation: 'fadeIn 0.5s ease-out' }} role="main">
       <a href="#itinerary-results" className="skip-link" style={{
         position: 'absolute', left: '-9999px', top: '0',
-        background: 'var(--accent-google-blue)', color: '#fff', padding: '8px 16px',
-        zIndex: 100, borderRadius: '0 0 8px 0',
+        background: 'var(--marker-blue)', color: '#fff', padding: '8px 16px',
+        zIndex: 100, borderRadius: '0 0 8px 0', border: '2px solid var(--ink-black)'
       }}>Skip to results</a>
 
-      <div className="glass-panel" style={{ padding: '2rem' }}>
-        <header style={{ marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>
-          <h1 style={{ fontSize: '1.8rem', margin: '0 0 0.25rem 0', background: 'var(--primary-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+      <div className="comic-box" style={{ padding: '2rem', background: 'var(--paper-white)', marginBottom: '2rem' }}>
+        <header style={{ marginBottom: '1.5rem', borderBottom: '2px dashed var(--ink-black)', paddingBottom: '1rem' }}>
+          <h1 className="cartoon-font" style={{ fontSize: '3rem', margin: '0 0 0.5rem 0', color: 'var(--ink-black)' }}>
             Trip Planner
           </h1>
-          <p style={{ color: '#a0a0a0', margin: 0, fontSize: '0.95rem' }}>
+          <p className="cartoon-font" style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '1.5rem' }}>
             Configure your trip and let AI generate a weather-aware itinerary.
           </p>
         </header>
@@ -153,8 +166,8 @@ export default function Dashboard({ user }) {
         <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '1.5rem', alignItems: 'start' }}>
           {/* Sidebar Form */}
           <aside aria-label="Trip configuration form">
-            <div className="glass-panel" style={{ padding: '1.5rem', textAlign: 'left' }}>
-              <h2 style={{ marginTop: 0, marginBottom: '1.25rem', fontSize: '1.2rem' }}>Trip Details</h2>
+            <div className="comic-box" style={{ padding: '1.5rem', textAlign: 'left', background: 'var(--paper-white)' }}>
+              <h2 className="cartoon-font" style={{ marginTop: 0, marginBottom: '1.25rem', fontSize: '2rem', color: 'var(--ink-black)' }}>Trip Details</h2>
               <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div>
                   <label htmlFor="destination" style={labelStyle}>Destination *</label>
@@ -196,18 +209,20 @@ export default function Dashboard({ user }) {
                 </div>
 
                 {/* Preferences Chips */}
-                <div>
+                <div style={{ marginTop: '0.5rem' }}>
                   <label style={labelStyle}>Interests</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }} role="group" aria-label="Travel interests">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }} role="group" aria-label="Travel interests">
                     {PREFERENCE_OPTIONS.map((pref) => (
                       <button key={pref.id} type="button" onClick={() => togglePref(pref.value)}
                         aria-pressed={selectedPrefs.includes(pref.value)}
                         style={{
-                          padding: '6px 12px', borderRadius: '20px', fontSize: '0.8rem',
-                          border: selectedPrefs.includes(pref.value) ? '1px solid var(--accent-google-blue)' : '1px solid rgba(255,255,255,0.15)',
-                          background: selectedPrefs.includes(pref.value) ? 'rgba(66,133,244,0.2)' : 'rgba(255,255,255,0.05)',
-                          color: selectedPrefs.includes(pref.value) ? '#8ab4f8' : '#aaa',
-                          cursor: 'pointer', transition: 'all 0.2s',
+                          padding: '6px 12px', borderRadius: '8px', fontSize: '1rem', fontFamily: 'Nunito, sans-serif', fontWeight: 'bold',
+                          border: '2px solid var(--ink-black)',
+                          background: selectedPrefs.includes(pref.value) ? 'var(--marker-blue)' : 'var(--paper-white)',
+                          color: selectedPrefs.includes(pref.value) ? 'white' : 'var(--ink-black)',
+                          boxShadow: selectedPrefs.includes(pref.value) ? '1px 1px 0px var(--ink-black)' : '3px 3px 0px var(--ink-black)',
+                          transform: selectedPrefs.includes(pref.value) ? 'translate(2px, 2px)' : 'none',
+                          cursor: 'pointer', transition: 'all 0.1s',
                         }}>
                         {pref.label}
                       </button>
@@ -239,13 +254,19 @@ export default function Dashboard({ user }) {
 
                 <button type="button" onClick={handleGenerate} disabled={loading}
                   aria-busy={loading}
+                  className="comic-box"
                   style={{
-                    background: loading ? '#555' : 'var(--primary-gradient)',
-                    color: 'white', border: 'none', padding: '0.9rem',
-                    borderRadius: '12px', fontWeight: 'bold', fontSize: '1rem',
-                    cursor: loading ? 'wait' : 'pointer', marginTop: '0.5rem',
-                    transition: 'all 0.3s', fontFamily: 'inherit',
-                  }}>
+                    background: loading ? 'var(--text-secondary)' : 'var(--marker-yellow)',
+                    color: 'var(--ink-black)', border: '2px solid var(--ink-black)', padding: '1rem',
+                    borderRadius: '8px', fontWeight: 'bold', fontSize: '1.2rem',
+                    cursor: loading ? 'wait' : 'pointer', marginTop: '1rem',
+                    transition: 'all 0.1s', fontFamily: 'Nunito, sans-serif',
+                    boxShadow: '4px 4px 0px var(--ink-black)'
+                  }}
+                  onMouseOver={(e) => { if(!loading) { e.currentTarget.style.transform = 'translate(-2px, -2px)'; e.currentTarget.style.boxShadow = '6px 6px 0px var(--ink-black)'; } }}
+                  onMouseOut={(e) => { if(!loading) { e.currentTarget.style.transform = 'translate(0)'; e.currentTarget.style.boxShadow = '4px 4px 0px var(--ink-black)'; } }}
+                  onMouseDown={(e) => { if(!loading) { e.currentTarget.style.transform = 'translate(2px, 2px)'; e.currentTarget.style.boxShadow = '2px 2px 0px var(--ink-black)'; } }}
+                >
                   {loading ? '⏳ Generating...' : '✨ Generate Itinerary'}
                 </button>
               </form>
@@ -264,18 +285,18 @@ export default function Dashboard({ user }) {
             )}
 
             {loading && (
-              <div className="glass-panel" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '1rem', animation: 'pulse 1.5s infinite' }}>🌍</div>
-                <h3 style={{ color: '#ccc' }}>Planning your perfect trip...</h3>
-                <p style={{ color: '#888' }}>Analyzing weather, finding activities, crafting your itinerary</p>
+              <div className="comic-box" style={{ textAlign: 'center', padding: '4rem 2rem', background: 'var(--paper-white)' }}>
+                <div style={{ fontSize: '4rem', marginBottom: '1rem', animation: 'pulse 1.5s infinite' }}>🌍</div>
+                <h3 className="cartoon-font" style={{ color: 'var(--ink-black)', fontSize: '2rem' }}>Planning your perfect trip...</h3>
+                <p className="cartoon-font" style={{ color: 'var(--text-secondary)', fontSize: '1.5rem' }}>Analyzing weather, finding activities, crafting your itinerary</p>
               </div>
             )}
 
             {!itinerary && !loading && (
-              <div className="glass-panel" style={{ height: '100%', minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>🗺️</div>
-                <h3 style={{ color: '#888' }}>Your Itinerary Awaits</h3>
-                <p style={{ color: '#666', textAlign: 'center', maxWidth: '300px' }}>
+              <div className="comic-box" style={{ height: '100%', minHeight: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', background: 'var(--paper-white)' }}>
+                <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.8 }}>🗺️</div>
+                <h3 className="cartoon-font" style={{ color: 'var(--ink-black)', fontSize: '2rem' }}>Your Itinerary Awaits</h3>
+                <p className="cartoon-font" style={{ color: 'var(--text-secondary)', textAlign: 'center', maxWidth: '400px', fontSize: '1.5rem' }}>
                   Fill out the trip details and click "Generate" to see your AI-powered plan.
                 </p>
               </div>
@@ -284,16 +305,16 @@ export default function Dashboard({ user }) {
             {itinerary && !loading && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {/* Summary */}
-                <div className="glass-panel" style={{ padding: '1.5rem' }}>
-                  <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.4rem', background: 'var(--primary-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <div className="comic-box" style={{ padding: '1.5rem', background: 'var(--paper-white)' }}>
+                  <h2 className="cartoon-font" style={{ margin: '0 0 0.5rem 0', fontSize: '2rem', color: 'var(--ink-black)' }}>
                     📍 {itinerary.destination || destination}
                   </h2>
-                  <p style={{ color: '#bbb', margin: '0 0 0.75rem 0' }}>{itinerary.summary}</p>
+                  <p style={{ color: 'var(--text-secondary)', margin: '0 0 0.75rem 0', fontSize: '1.1rem', fontWeight: 'bold' }}>{itinerary.summary}</p>
                   {itinerary.weather_overview && (
-                    <p style={{ color: '#8ab4f8', fontSize: '0.9rem', margin: 0 }}>🌤️ {itinerary.weather_overview}</p>
+                    <p className="cartoon-font" style={{ color: 'var(--marker-blue)', fontSize: '1.5rem', margin: 0 }}>🌤️ {itinerary.weather_overview}</p>
                   )}
                   {itinerary.total_estimated_cost_usd && (
-                    <p style={{ color: '#34A853', fontSize: '0.9rem', margin: '0.5rem 0 0 0', fontWeight: 600 }}>
+                    <p className="cartoon-font" style={{ color: 'var(--marker-green)', fontSize: '1.5rem', margin: '0.5rem 0 0 0', fontWeight: 'bold' }}>
                       💰 Estimated total: ${itinerary.total_estimated_cost_usd}
                     </p>
                   )}
@@ -301,42 +322,43 @@ export default function Dashboard({ user }) {
 
                 {/* Day Cards */}
                 {(itinerary.itinerary || []).map((day) => (
-                  <div key={day.day} className="glass-panel" style={{ padding: '1.5rem' }}>
+                  <div key={day.day} className="comic-box" style={{ padding: '1.5rem', background: 'var(--paper-white)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                      <h3 style={{ margin: 0, color: '#8ab4f8' }}>
+                      <h3 className="cartoon-font" style={{ margin: 0, color: 'var(--marker-blue)', fontSize: '1.8rem' }}>
                         Day {day.day} — {day.theme}
                       </h3>
-                      <span style={{ color: '#888', fontSize: '0.85rem' }}>{day.date}</span>
+                      <span className="cartoon-font" style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>{day.date}</span>
                     </div>
                     {day.weather_note && (
-                      <p style={{ color: '#FBBC05', fontSize: '0.85rem', margin: '0 0 1rem 0' }}>
+                      <p className="cartoon-font" style={{ color: 'var(--marker-yellow)', fontSize: '1.2rem', margin: '0 0 1rem 0' }}>
                         🌤️ {day.weather_note}
                       </p>
                     )}
 
                     {/* Activities */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                       {(day.activities || []).map((act, i) => (
                         <div key={i} style={{
-                          display: 'flex', gap: '1rem', padding: '0.75rem',
-                          background: 'rgba(255,255,255,0.03)', borderRadius: '10px',
-                          border: '1px solid rgba(255,255,255,0.06)',
+                          display: 'flex', gap: '1rem', padding: '1rem',
+                          background: 'white', borderRadius: '8px',
+                          border: '2px solid var(--ink-black)',
+                          boxShadow: '3px 3px 0px var(--ink-black)'
                         }}>
-                          <div style={{ minWidth: '50px', color: '#8ab4f8', fontWeight: 600, fontSize: '0.85rem' }}>
+                          <div className="cartoon-font" style={{ minWidth: '60px', color: 'var(--marker-red)', fontSize: '1.2rem' }}>
                             {act.time}
                           </div>
                           <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 600, marginBottom: '2px' }}>
+                            <div className="cartoon-font" style={{ fontSize: '1.5rem', marginBottom: '4px', color: 'var(--ink-black)' }}>
                               {act.name}
-                              {act.indoor && <span style={{ marginLeft: '6px', fontSize: '0.75rem', color: '#aaa' }}>🏠 Indoor</span>}
+                              {act.indoor && <span style={{ marginLeft: '8px', fontSize: '1rem', color: 'var(--text-secondary)' }}>🏠 Indoor</span>}
                             </div>
-                            <div style={{ color: '#aaa', fontSize: '0.85rem' }}>{act.description}</div>
-                            <div style={{ display: 'flex', gap: '12px', marginTop: '4px', fontSize: '0.8rem', color: '#888' }}>
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontFamily: 'Nunito, sans-serif' }}>{act.description}</div>
+                            <div className="cartoon-font" style={{ display: 'flex', gap: '12px', marginTop: '8px', fontSize: '1.2rem', color: 'var(--ink-black)' }}>
                               <span>⏱️ {act.duration_hours}h</span>
                               <span>💵 ${act.estimated_cost_usd}</span>
                               <span style={{
-                                background: 'rgba(66,133,244,0.15)', padding: '1px 8px',
-                                borderRadius: '10px', color: '#8ab4f8',
+                                background: 'var(--marker-blue)', padding: '2px 8px',
+                                borderRadius: '8px', color: 'white', border: '2px solid var(--ink-black)'
                               }}>{act.category}</span>
                             </div>
                           </div>
@@ -346,13 +368,13 @@ export default function Dashboard({ user }) {
 
                     {/* Meals */}
                     {day.meals && day.meals.length > 0 && (
-                      <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                        <div style={{ fontSize: '0.85rem', color: '#888', marginBottom: '0.5rem' }}>🍽️ Meals</div>
+                      <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '2px dashed var(--ink-black)' }}>
+                        <div className="cartoon-font" style={{ fontSize: '1.5rem', color: 'var(--ink-black)', marginBottom: '0.5rem' }}>🍽️ Meals</div>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                           {day.meals.map((meal, i) => (
                             <span key={i} style={{
-                              padding: '4px 10px', borderRadius: '8px', fontSize: '0.8rem',
-                              background: 'rgba(255,255,255,0.05)', color: '#ccc',
+                              padding: '6px 12px', borderRadius: '8px', fontSize: '1rem', fontFamily: 'Nunito, sans-serif', fontWeight: 'bold',
+                              background: 'var(--marker-yellow)', color: 'var(--ink-black)', border: '2px solid var(--ink-black)', boxShadow: '2px 2px 0px var(--ink-black)'
                             }}>
                               {meal.meal_type}: {meal.suggestion} (${meal.estimated_cost_usd})
                             </span>
@@ -362,7 +384,7 @@ export default function Dashboard({ user }) {
                     )}
 
                     {day.daily_budget_estimate_usd > 0 && (
-                      <div style={{ textAlign: 'right', marginTop: '0.5rem', fontSize: '0.85rem', color: '#34A853' }}>
+                      <div className="cartoon-font" style={{ textAlign: 'right', marginTop: '1rem', fontSize: '1.5rem', color: 'var(--marker-green)' }}>
                         Day budget: ${day.daily_budget_estimate_usd}
                       </div>
                     )}
@@ -371,20 +393,20 @@ export default function Dashboard({ user }) {
 
                 {/* Tips */}
                 {(itinerary.packing_tips?.length > 0 || itinerary.local_tips?.length > 0) && (
-                  <div className="glass-panel" style={{ padding: '1.5rem' }}>
+                  <div className="comic-box" style={{ padding: '1.5rem', background: 'var(--paper-white)' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                       {itinerary.packing_tips?.length > 0 && (
                         <div>
-                          <h4 style={{ margin: '0 0 0.5rem 0', color: '#FBBC05' }}>🎒 Packing Tips</h4>
-                          <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#bbb', fontSize: '0.9rem' }}>
+                          <h4 className="cartoon-font" style={{ margin: '0 0 0.5rem 0', color: 'var(--marker-yellow)', fontSize: '1.5rem' }}>🎒 Packing Tips</h4>
+                          <ul style={{ margin: 0, paddingLeft: '1.25rem', color: 'var(--ink-black)', fontSize: '1rem', fontFamily: 'Nunito, sans-serif' }}>
                             {itinerary.packing_tips.map((tip, i) => <li key={i} style={{ marginBottom: '4px' }}>{tip}</li>)}
                           </ul>
                         </div>
                       )}
                       {itinerary.local_tips?.length > 0 && (
                         <div>
-                          <h4 style={{ margin: '0 0 0.5rem 0', color: '#34A853' }}>📌 Local Tips</h4>
-                          <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#bbb', fontSize: '0.9rem' }}>
+                          <h4 className="cartoon-font" style={{ margin: '0 0 0.5rem 0', color: 'var(--marker-green)', fontSize: '1.5rem' }}>📌 Local Tips</h4>
+                          <ul style={{ margin: 0, paddingLeft: '1.25rem', color: 'var(--ink-black)', fontSize: '1rem', fontFamily: 'Nunito, sans-serif' }}>
                             {itinerary.local_tips.map((tip, i) => <li key={i} style={{ marginBottom: '4px' }}>{tip}</li>)}
                           </ul>
                         </div>
@@ -394,27 +416,32 @@ export default function Dashboard({ user }) {
                 )}
 
                 {/* Re-plan Section */}
-                <div className="glass-panel" style={{ padding: '1.5rem' }}>
-                  <h3 style={{ margin: '0 0 0.75rem 0', color: '#EA4335' }}>🔄 Real-Time Re-Plan</h3>
-                  <p style={{ color: '#aaa', fontSize: '0.85rem', margin: '0 0 0.75rem 0' }}>
+                <div className="comic-box" style={{ padding: '1.5rem', background: 'var(--paper-white)' }}>
+                  <h3 className="cartoon-font" style={{ margin: '0 0 0.75rem 0', color: 'var(--marker-red)', fontSize: '1.8rem' }}>🔄 Real-Time Re-Plan</h3>
+                  <p className="cartoon-font" style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', margin: '0 0 1rem 0' }}>
                     Simulate a disruption and see how the AI adapts your itinerary in real-time.
                   </p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }} role="group" aria-label="Disruption scenarios">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }} role="group" aria-label="Disruption scenarios">
                     {DISRUPTION_OPTIONS.map((d, i) => (
                       <button key={i} type="button" onClick={() => handleReplan(d)}
                         disabled={replanLoading}
                         style={{
-                          padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem',
-                          border: '1px solid rgba(234,67,53,0.3)',
-                          background: 'rgba(234,67,53,0.1)', color: '#ff8a80',
-                          cursor: replanLoading ? 'wait' : 'pointer', transition: 'all 0.2s',
-                          fontFamily: 'inherit',
-                        }}>
+                          padding: '8px 16px', borderRadius: '8px', fontSize: '1rem',
+                          border: '2px solid var(--ink-black)',
+                          background: 'var(--marker-red)', color: 'white',
+                          cursor: replanLoading ? 'wait' : 'pointer', transition: 'all 0.1s',
+                          fontFamily: 'Nunito, sans-serif', fontWeight: 'bold',
+                          boxShadow: '3px 3px 0px var(--ink-black)',
+                        }}
+                        onMouseOver={(e) => { if(!replanLoading) { e.currentTarget.style.transform = 'translate(-2px, -2px)'; e.currentTarget.style.boxShadow = '5px 5px 0px var(--ink-black)'; } }}
+                        onMouseOut={(e) => { if(!replanLoading) { e.currentTarget.style.transform = 'translate(0)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--ink-black)'; } }}
+                        onMouseDown={(e) => { if(!replanLoading) { e.currentTarget.style.transform = 'translate(2px, 2px)'; e.currentTarget.style.boxShadow = '1px 1px 0px var(--ink-black)'; } }}
+                      >
                         {d}
                       </button>
                     ))}
                   </div>
-                  {replanLoading && <p style={{ color: '#FBBC05', marginTop: '0.5rem' }}>🔄 Re-planning...</p>}
+                  {replanLoading && <p className="cartoon-font" style={{ color: 'var(--marker-yellow)', marginTop: '1rem', fontSize: '1.2rem' }}>🔄 Re-planning...</p>}
                 </div>
               </div>
             )}
@@ -426,7 +453,7 @@ export default function Dashboard({ user }) {
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         .skip-link:focus { left: 0 !important; }
         @media (max-width: 800px) {
-          .glass-panel > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+          .comic-box > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </main>

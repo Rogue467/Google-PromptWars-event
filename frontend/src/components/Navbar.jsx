@@ -65,26 +65,6 @@ export default function Navbar({ user, onSignOut, onOpenSettings }) {
               >
                 ⚙️ Settings
               </button>
-              <button 
-                onClick={onSignOut}
-                style={{
-                  background: 'var(--marker-red)',
-                  border: '2px solid var(--ink-black)',
-                  color: 'var(--ink-black)',
-                  padding: '0.4rem 1rem',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontFamily: 'Nunito, sans-serif',
-                  fontWeight: '800',
-                  boxShadow: '3px 3px 0px var(--ink-black)',
-                  transition: 'all 0.1s'
-                }}
-                onMouseOver={(e) => { e.currentTarget.style.transform = 'translate(-2px, -2px)'; e.currentTarget.style.boxShadow = '5px 5px 0px var(--ink-black)'; }}
-                onMouseOut={(e) => { e.currentTarget.style.transform = 'translate(0)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--ink-black)'; }}
-                onMouseDown={(e) => { e.currentTarget.style.transform = 'translate(2px, 2px)'; e.currentTarget.style.boxShadow = '1px 1px 0px var(--ink-black)'; }}
-              >
-                Sign Out
-              </button>
             </div>
           </div>
         ) : (

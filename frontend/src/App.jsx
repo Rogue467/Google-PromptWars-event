@@ -112,6 +112,7 @@ function App() {
             user={user} 
             onClose={() => setIsSettingsOpen(false)} 
             onUserUpdated={handleUserUpdated}
+            onSignOut={handleSignOut}
           />
         )}
 

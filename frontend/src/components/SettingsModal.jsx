@@ -4,7 +4,7 @@ import { updateProfile, deleteUser } from 'firebase/auth';
 import { auth } from '../firebase';
 import { X, Trash2, Save, User, Image as ImageIcon } from 'lucide-react';
 
-export default function SettingsModal({ user, onClose, onUserUpdated }) {
+export default function SettingsModal({ user, onClose, onUserUpdated, onSignOut }) {
   const [displayName, setDisplayName] = useState(user?.displayName || '');
   const [photoURL, setPhotoURL] = useState(user?.photoURL || '');
   const [loading, setLoading] = useState(false);
@@ -190,6 +190,32 @@ export default function SettingsModal({ user, onClose, onUserUpdated }) {
               <Save size={20} /> {loading ? 'Saving...' : 'Save Profile'}
             </button>
           </form>
+
+          <div style={{ marginTop: '2rem' }}>
+            <button 
+              onClick={() => { onClose(); onSignOut(); }}
+              className="comic-box"
+              style={{
+                background: 'var(--marker-red)',
+                border: '2px solid var(--ink-black)',
+                color: 'var(--ink-black)',
+                padding: '0.8rem 1rem',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontFamily: 'Nunito, sans-serif',
+                fontWeight: '800',
+                boxShadow: '3px 3px 0px var(--ink-black)',
+                width: '100%',
+                fontSize: '1.2rem',
+                transition: 'all 0.1s'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = 'translate(-2px, -2px)'; e.currentTarget.style.boxShadow = '5px 5px 0px var(--ink-black)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = 'translate(0)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--ink-black)'; }}
+              onMouseDown={(e) => { e.currentTarget.style.transform = 'translate(2px, 2px)'; e.currentTarget.style.boxShadow = '1px 1px 0px var(--ink-black)'; }}
+            >
+              Sign Out
+            </button>
+          </div>
 
           <hr style={{ border: '1px dashed var(--ink-black)', margin: '2rem 0', opacity: 0.3 }} />
 
