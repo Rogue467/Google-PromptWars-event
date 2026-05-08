@@ -1,15 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --bg-color: #0b0c10;
+  --bg-color: #050505; /* Deep YC dark mode */
+  --bg-color-secondary: #0a0a0a;
   --text-color: #ffffff;
+  --text-muted: #888888;
   --accent-google-blue: #4285F4;
   --accent-google-red: #EA4335;
   --accent-google-yellow: #FBBC05;
   --accent-google-green: #34A853;
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --primary-gradient: linear-gradient(135deg, var(--accent-google-blue), var(--accent-google-green));
+  --glass-bg: rgba(255, 255, 255, 0.02);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --primary-gradient: linear-gradient(135deg, #ffffff, #a0a0a0);
 }
 
 * {
@@ -19,14 +21,16 @@
 }
 
 body {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
   min-height: 100vh;
   overflow-x: hidden;
-  background-image: radial-gradient(circle at 15% 50%, rgba(66, 133, 244, 0.15), transparent 25%),
-                    radial-gradient(circle at 85% 30%, rgba(52, 168, 83, 0.15), transparent 25%);
+  /* Very subtle radial glow in the center */
+  background-image: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.05), transparent 40%);
   background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .app-container {
@@ -38,22 +42,18 @@ body {
   min-height: 100vh;
 }
 
-/* Glassmorphism utility */
+/* Glassmorphism utility -> Sleek YC Box */
 .glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--bg-color-secondary);
   border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  padding: 3rem;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
 }
 
 .glass-panel:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 /* Hero Section */
