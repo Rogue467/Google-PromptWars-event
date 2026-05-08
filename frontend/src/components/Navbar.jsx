@@ -21,8 +21,10 @@ export default function Navbar({ user, onSignOut, theme, toggleTheme }) {
       marginBottom: '2rem'
     }}>
       <Link to="/" style={{ textDecoration: 'none' }}>
-        <div style={{ fontSize: '1.2rem', fontWeight: '800', letterSpacing: '-0.5px', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-primary)' }}>
-          Prompt<span style={{ background: 'var(--google-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Wars</span>
+        <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontSize: '1.4rem', fontWeight: '800', letterSpacing: '-0.5px', display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-primary)', cursor: 'grab' }}
+             onMouseDown={(e) => e.currentTarget.style.cursor = 'grabbing'}
+             onMouseUp={(e) => e.currentTarget.style.cursor = 'grab'}>
+          Travi<span style={{ background: 'var(--google-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>!</span>
         </div>
       </Link>
       

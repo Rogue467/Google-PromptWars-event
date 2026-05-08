@@ -1,11 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import { auth } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import './index.css';
+
+// Custom Cursor Component
+const CustomCursor = () => {
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+  
+  const springConfig = { damping: 25, stiffness: 700 };
+  const cursorXSpring = useSpring(cursorX, springConfig);
+  const cursorYSpring = useSpring(cursorY, springConfig);
+
+  useEffect(() => {
+    const moveCursor = (e) => {
+      cursorX.set(e.clientX - 16); // Center the 32px cursor
+      cursorY.set(e.clientY - 16);
+    };
+    window.addEventListener('mousemove', moveCursor);
+    return () => {
+      window.removeEventListener('mousemove', moveCursor);
+    };
+  }, []);
+
+  return (
+    <motion.div
+      style={{
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        width: '32px',
+        height: '32px',
+        borderRadius: '50%',
+        backgroundColor: 'var(--google-blue)',
+        mixBlendMode: 'difference',
+        pointerEvents: 'none',
+        zIndex: 9999,
+        translateX: cursorXSpring,
+        translateY: cursorYSpring,
+        opacity: 0.8
+      }}
+    />
+  );
+};
 
 function App() {
   const [user, setUser] = useState(null);
@@ -45,6 +87,7 @@ function App() {
 
   return (
     <Router>
+      <CustomCursor />
       <div className="ambient-glow"></div>
       <div className="app-container">
         <Navbar user={user} onSignOut={handleSignOut} theme={theme} toggleTheme={toggleTheme} />
