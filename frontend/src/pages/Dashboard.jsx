@@ -470,22 +470,8 @@ export default function Dashboard({ user }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {/* Summary */}
                 <div className="comic-box" style={{ padding: '1.5rem', background: 'var(--paper-white)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
-                    <div style={{ flex: 1 }}>
-                      <h2 className="cartoon-font" style={{ margin: '0 0 0.5rem 0', fontSize: '2rem', color: 'var(--ink-black)' }}>
-                        📍 {itinerary.destination || destination}
-                      </h2>
-                      <p style={{ color: 'var(--text-secondary)', margin: '0 0 0.75rem 0', fontSize: '1.1rem', fontWeight: 'bold' }}>{itinerary.summary}</p>
-                      {itinerary.weather_overview && (
-                        <p className="cartoon-font" style={{ color: 'var(--marker-blue)', fontSize: '1.5rem', margin: 0 }}>🌤️ {itinerary.weather_overview}</p>
-                      )}
-                      {itinerary.total_estimated_cost_usd && (
-                        <p className="cartoon-font" style={{ color: 'var(--marker-green)', fontSize: '1.5rem', margin: '0.5rem 0 0 0', fontWeight: 'bold' }}>
-                          💰 Estimated total: ${itinerary.total_estimated_cost_usd}
-                        </p>
-                      )}
-                    </div>
-                    {/* Save Trip Button */}
+                  {/* Action buttons — top right */}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginBottom: '0.75rem' }}>
                     <button
                       onClick={async () => {
                         setSaveStatus('saving');
@@ -500,45 +486,57 @@ export default function Dashboard({ user }) {
                       }}
                       disabled={saveStatus === 'saving'}
                       style={{
-                        padding: '0.6rem 1rem', borderRadius: '8px',
+                        padding: '0.4rem 0.75rem', borderRadius: '8px',
                         border: '2px solid var(--ink-black)',
                         background: saveStatus === 'saved' ? 'var(--marker-green)' : 'var(--marker-yellow)',
                         color: saveStatus === 'saved' ? 'white' : 'var(--ink-black)',
-                        fontFamily: 'Nunito, sans-serif', fontWeight: 'bold', fontSize: '1rem',
+                        fontFamily: 'Nunito, sans-serif', fontWeight: 'bold', fontSize: '0.85rem',
                         cursor: saveStatus === 'saving' ? 'wait' : 'pointer',
-                        boxShadow: '3px 3px 0px var(--ink-black)',
-                        display: 'flex', alignItems: 'center', gap: '6px',
-                        whiteSpace: 'nowrap', flexShrink: 0,
+                        boxShadow: '2px 2px 0px var(--ink-black)',
+                        display: 'flex', alignItems: 'center', gap: '4px',
+                        whiteSpace: 'nowrap',
                         transition: 'all 0.15s',
                       }}
                     >
-                      <Bookmark size={18} fill={saveStatus === 'saved' ? 'white' : 'none'} />
-                      {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved!' : 'Save Trip'}
+                      <Bookmark size={14} fill={saveStatus === 'saved' ? 'white' : 'none'} />
+                      {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved!' : 'Save'}
                     </button>
-                    {/* Share Trip Button */}
                     {user && (
                       <button
                         onClick={() => setIsShareOpen(true)}
                         style={{
-                          padding: '0.6rem 1rem', borderRadius: '8px',
+                          padding: '0.4rem 0.75rem', borderRadius: '8px',
                           border: '2px solid var(--ink-black)',
                           background: 'var(--marker-blue)',
                           color: 'white',
-                          fontFamily: 'Nunito, sans-serif', fontWeight: 'bold', fontSize: '1rem',
+                          fontFamily: 'Nunito, sans-serif', fontWeight: 'bold', fontSize: '0.85rem',
                           cursor: 'pointer',
-                          boxShadow: '3px 3px 0px var(--ink-black)',
-                          display: 'flex', alignItems: 'center', gap: '6px',
-                          whiteSpace: 'nowrap', flexShrink: 0,
+                          boxShadow: '2px 2px 0px var(--ink-black)',
+                          display: 'flex', alignItems: 'center', gap: '4px',
+                          whiteSpace: 'nowrap',
                           transition: 'all 0.15s',
                         }}
-                        onMouseOver={(e) => { e.currentTarget.style.transform = 'translate(-2px, -2px)'; e.currentTarget.style.boxShadow = '5px 5px 0px var(--ink-black)'; }}
-                        onMouseOut={(e) => { e.currentTarget.style.transform = 'translate(0)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--ink-black)'; }}
+                        onMouseOver={(e) => { e.currentTarget.style.transform = 'translate(-1px, -1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px var(--ink-black)'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.transform = 'translate(0)'; e.currentTarget.style.boxShadow = '2px 2px 0px var(--ink-black)'; }}
                       >
-                        <Share2 size={18} />
-                        Share Trip
+                        <Share2 size={14} />
+                        Share
                       </button>
                     )}
                   </div>
+                  {/* Trip summary — full width */}
+                  <h2 className="cartoon-font" style={{ margin: '0 0 0.5rem 0', fontSize: '2rem', color: 'var(--ink-black)' }}>
+                    📍 {itinerary.destination || destination}
+                  </h2>
+                  <p style={{ color: 'var(--text-secondary)', margin: '0 0 0.75rem 0', fontSize: '1.1rem', fontWeight: 'bold' }}>{itinerary.summary}</p>
+                  {itinerary.weather_overview && (
+                    <p className="cartoon-font" style={{ color: 'var(--marker-blue)', fontSize: '1.5rem', margin: 0 }}>🌤️ {itinerary.weather_overview}</p>
+                  )}
+                  {itinerary.total_estimated_cost_usd && (
+                    <p className="cartoon-font" style={{ color: 'var(--marker-green)', fontSize: '1.5rem', margin: '0.5rem 0 0 0', fontWeight: 'bold' }}>
+                      💰 Estimated total: ${itinerary.total_estimated_cost_usd}
+                    </p>
+                  )}
                 </div>
 
                 {/* Day Card Carousel */}
