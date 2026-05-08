@@ -124,21 +124,6 @@ export default function Landing({ onLoginSuccess }) {
             
             <circle cx="85%" cy="150" r="40" fill="transparent" stroke="var(--marker-yellow)" strokeWidth="4" />
             <path d="M 85% 90 L 85% 60 M 85% 210 L 85% 240 M 75% 150 L 70% 150 M 95% 150 L 100% 150 M 78% 108 L 73% 78 M 92% 192 L 97% 222 M 92% 108 L 97% 78 M 78% 192 L 73% 222" stroke="var(--marker-yellow)" strokeWidth="4" strokeLinecap="round" />
-            
-            <path d="M 10% 200 Q 30% 250, 40% 280" fill="transparent" stroke="var(--marker-red)" strokeWidth="3" strokeLinecap="round" opacity={0.7} />
-            <polygon points="38%,278 40%,280 39%,274" fill="var(--marker-red)" opacity={0.7} />
-
-            <path d="M 90% 100 Q 70% 200, 60% 250" fill="transparent" stroke="var(--marker-green)" strokeWidth="3" strokeLinecap="round" opacity={0.7} />
-            <polygon points="62%,248 60%,250 61%,244" fill="var(--marker-green)" opacity={0.7} />
-
-            <path d="M 50% 50 Q 55% 150, 52% 220" fill="transparent" stroke="var(--marker-blue)" strokeWidth="4" strokeLinecap="round" strokeDasharray="5 5" opacity={0.7} />
-            <polygon points="50%,215 52%,220 54%,215" fill="var(--marker-blue)" opacity={0.7} />
-
-            <path d="M 20% 500 Q 35% 400, 45% 350" fill="transparent" stroke="var(--marker-yellow)" strokeWidth="4" strokeLinecap="round" opacity={0.8} />
-            <polygon points="43%,352 45%,350 44%,356" fill="var(--marker-yellow)" opacity={0.8} />
-
-            <path d="M 80% 600 Q 65% 450, 55% 350" fill="transparent" stroke="var(--ink-black)" strokeWidth="2" strokeLinecap="round" opacity={0.5} />
-            <polygon points="57%,352 55%,350 56%,356" fill="var(--ink-black)" opacity={0.5} />
           </svg>
 
           {/* Plane following the SVG path */}
@@ -237,6 +222,35 @@ export default function Landing({ onLoginSuccess }) {
           zIndex: 10
         }}>
           
+          {/* Animated Arrows Pointing to Logo */}
+          <div className="wiggle" style={{ position: 'absolute', top: '15%', left: '10%', transform: 'rotate(20deg)' }}>
+            <svg width="100" height="100" viewBox="0 0 100 100">
+              <path d="M 10 10 Q 50 20, 80 80" fill="transparent" stroke="var(--marker-red)" strokeWidth="4" strokeLinecap="round" />
+              <polygon points="75,70 80,80 70,80" fill="var(--marker-red)" />
+            </svg>
+          </div>
+
+          <div className="pulse" style={{ position: 'absolute', top: '10%', right: '15%', transform: 'rotate(-40deg)' }}>
+            <svg width="80" height="80" viewBox="0 0 100 100">
+              <path d="M 90 10 Q 50 40, 20 80" fill="transparent" stroke="var(--marker-green)" strokeWidth="4" strokeLinecap="round" strokeDasharray="5 5" />
+              <polygon points="25,70 20,80 30,80" fill="var(--marker-green)" />
+            </svg>
+          </div>
+
+          <div className="drift" style={{ position: 'absolute', top: '70%', left: '15%', transform: 'rotate(-15deg)' }}>
+            <svg width="120" height="80" viewBox="0 0 120 80">
+              <path d="M 10 70 Q 60 60, 110 10" fill="transparent" stroke="var(--marker-blue)" strokeWidth="5" strokeLinecap="round" />
+              <polygon points="100,15 110,10 105,25" fill="var(--marker-blue)" />
+            </svg>
+          </div>
+
+          <div className="wiggle" style={{ position: 'absolute', top: '65%', right: '10%', transform: 'rotate(10deg)' }}>
+            <svg width="90" height="90" viewBox="0 0 100 100">
+              <path d="M 90 90 Q 50 60, 10 10" fill="transparent" stroke="var(--marker-yellow)" strokeWidth="4" strokeLinecap="round" />
+              <polygon points="20,15 10,10 15,20" fill="var(--marker-yellow)" />
+            </svg>
+          </div>
+
           <motion.div 
             whileHover={{ scale: 1.1, rotate: 5 }}
             whileTap={{ scale: 0.9 }}

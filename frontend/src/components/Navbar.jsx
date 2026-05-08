@@ -1,29 +1,38 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plane } from 'lucide-react';
+import { motion } from 'framer-motion';
 import Login from './Login';
 
 export default function Navbar({ user, onSignOut }) {
   return (
-    <nav style={{
-      position: 'sticky',
-      top: '1rem',
-      zIndex: 100,
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '0.8rem 1.5rem',
-      background: 'var(--paper-white)',
-      border: 'var(--border-thick)',
-      borderRadius: '8px',
-      boxShadow: 'var(--shadow-solid)',
-      marginBottom: '2rem'
-    }}>
+    <motion.nav 
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 100, damping: 15, duration: 0.8 }}
+      style={{
+        position: 'sticky',
+        top: '1rem',
+        zIndex: 100,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '0.8rem 1.5rem',
+        background: 'var(--paper-white)',
+        border: 'var(--border-thick)',
+        borderRadius: '8px',
+        boxShadow: 'var(--shadow-solid)',
+        marginBottom: '2rem'
+      }}
+    >
       <Link to="/" style={{ textDecoration: 'none' }}>
-        <div className="cartoon-font" style={{ fontSize: '2rem', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-black)', cursor: 'grab', transform: 'rotate(-2deg)' }}
-             onMouseDown={(e) => e.currentTarget.style.cursor = 'grabbing'}
-             onMouseUp={(e) => e.currentTarget.style.cursor = 'grab'}>
-          <Plane size={28} color="var(--marker-blue)" fill="var(--marker-blue)" style={{ transform: 'rotate(45deg)' }} />
+        <div className="cartoon-font" style={{ fontSize: '2rem', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--ink-black)', cursor: 'grab' }}>
+          <motion.div
+            animate={{ y: [0, -5, 0], rotate: [45, 40, 50, 45] }}
+            transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+          >
+            <Plane size={28} color="var(--marker-blue)" fill="var(--marker-blue)" style={{ transform: 'rotate(45deg)' }} />
+          </motion.div>
           Travi!
         </div>
       </Link>
@@ -62,6 +71,6 @@ export default function Navbar({ user, onSignOut }) {
           </div>
         )}
       </div>
-    </nav>
+    </motion.nav>
   );
 }
