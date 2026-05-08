@@ -643,7 +643,7 @@ export default function Dashboard({ user }) {
                                 <span className="cartoon-font" style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>{currentDay.date}</span>
                               </div>
                               {currentDay.weather_note && (
-                                <p className="cartoon-font" style={{ color: 'var(--marker-yellow)', fontSize: '1.2rem', margin: '0 0 1rem 0' }}>
+                                <p className="cartoon-font" style={{ color: '#1a6b5a', fontSize: '1.2rem', margin: '0 0 1rem 0', background: '#e8f5f1', padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1.5px solid #b2dfdb' }}>
                                   🌤️ {currentDay.weather_note}
                                 </p>
                               )}
